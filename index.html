@@ -148,7 +148,7 @@ const DEFAULT_RESTAURANT="11111111-1111-4111-8111-111111111111";
 const DEFAULT_TABLE="22222222-2222-4222-8222-222222222222";
 const STAFF_AUTH_STORAGE_KEY="qr-staff-auth-v1";
 const LEGACY_AUTH_STORAGE_KEY="sb-savepmyxoctonhjqgdxj-auth-token";
-try{if(!localStorage.getItem(STAFF_AUTH_STORAGE_KEY)){const legacy=localStorage.getItem(LEGACY_AUTH_STORAGE_KEY);if(legacy)localStorage.setItem(STAFF_AUTH_STORAGE_KEY,legacy)}}catch(e){console.warn("Could not migrate saved staff session",e)}
+try{if(!localStorage.getItem("qr-staff-auth-migration-done-v1")){if(!localStorage.getItem(STAFF_AUTH_STORAGE_KEY)){const legacy=localStorage.getItem(LEGACY_AUTH_STORAGE_KEY);if(legacy)localStorage.setItem(STAFF_AUTH_STORAGE_KEY,legacy)}localStorage.setItem("qr-staff-auth-migration-done-v1","1")}}catch(e){console.warn("Could not migrate saved staff session",e)}
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:STAFF_AUTH_STORAGE_KEY}});
 const params=new URLSearchParams(location.search),restaurantId=params.get("restaurant")||DEFAULT_RESTAURANT,tableId=params.get("table")||DEFAULT_TABLE,staffMode=params.get("staff")==="1",tablesPage=params.get("tables")==="1",ordersPage=params.get("orders")==="1",addToOrderMode=params.get("addToOrder")==="1",selectedOrderId=params.get("targetOrder")||"";
 let menuItems=[],cart={},activeCategory="All",tableNumber="1",channel=null,customerOrderChannel=null,menuSyncChannel=null,menuSyncTimer=null,menuSyncBusy=false,menuSyncSignature="",pendingModalAction=null,customerEditing={},customerEditStatus={},customerDrafts={},customerApprovalUntil={},orderTimer=null,editPollTimer=null,syncPollTimer=null,syncPollBusy=false;
