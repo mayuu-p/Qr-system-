@@ -205,7 +205,7 @@ function goAddFoodMenu(orderId){location.href=location.pathname+"?restaurant="+e
 function openCustomerOrders(){location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)+"&orders=1"}
 async function loadCustomerOrders(){
  const box=$("customerOrdersList");if(!box||!tableId)return;
- const {data:orders,error}=await db.from("orders").select("id,order_code,customer_name,status,total,created_at,accepted_at,edit_count").eq("restaurant_id",restaurantId).eq("table_id",tableId).not("status","in","(served,cancelled)").order("created_at",{ascending:false});
+ const {data:orders,error}=await db.from("orders").select("id,order_code,customer_name,status,total,created_at,accepted_at,edit_count,edit_paused_at,edit_seconds_remaining").eq("restaurant_id",restaurantId).eq("table_id",tableId).not("status","in","(served,cancelled)").order("created_at",{ascending:false});
  if(error){box.innerHTML='<p class="muted">Orders could not load: '+esc(error.message)+'</p>';return}
  $("customerOrdersCount").textContent=orders&&orders.length?"("+orders.length+")":"";$("customerOrdersBtn").classList.toggle("hidden",!orders||orders.length===0);
  if(!orders||!orders.length){box.innerHTML='<div class="order"><strong>No active orders yet</strong><p class="muted">Place an order and it will appear here.</p></div>';return}
@@ -218,37 +218,47 @@ async function loadCustomerOrders(){
   const status=customerEditStatus[o.id]||"none";
   let editUntil=accepted?accepted+120000:0;
   if(status==="approved"){editUntil=customerApprovalUntil[o.id]||editUntil}
-  const remaining=Math.max(0,editUntil-Date.now());
+  const remaining=o.edit_paused_at!=null?Math.max(0,Number(o.edit_seconds_remaining||0)*1000):Math.max(0,editUntil-Date.now());
   const editCount=Number(o.edit_count||0);
-  const editing=!!customerEditing[o.id]&&(remaining>0)&&(status!=="pending");
+  const editing=!!customerEditing[o.id]&&(status!=="pending");
   const rows=(items||[]).filter(i=>i.order_id===o.id);
   const draft=customerDrafts[o.id];
   const draftRows=editing?Object.values(draft||{}):rows.map(i=>({id:i.menu_item_id,name:i.item_name,quantity:i.quantity,price:i.unit_price}));
   return '<article class="order" data-order-card="'+o.id+'" style="padding:22px;border-radius:20px;animation-delay:'+Math.min(index*60,300)+'ms"><div class="section-head" style="margin-top:0"><div><div class="eyebrow">Order #'+esc(o.order_code||shortCode(o.id))+'</div><h2 style="font-size:22px;margin:5px 0">Table '+esc(tableNumber)+'</h2><span class="order-status-chip status-'+esc(String(o.status||"new").toLowerCase())+'">'+esc(({new:"Waiting for staff",accepted:"Accepted",preparing:"Preparing",ready:"Ready",served:"Served",cancelled:"Cancelled"})[String(o.status||"new").toLowerCase()]||o.status)+'</span></div><strong data-order-total style="font-size:22px">'+money(editing?draftRows.reduce((s,i)=>s+i.price*i.quantity,0):o.total)+'</strong></div>'+
   '<div class="order-items-grid">'+draftRows.map(i=>{const imgItem=menuItems.find(m=>m.id===(i.id||i.menu_item_id));const src=imgItem?imageFor(imgItem):"";return '<div class="order-item" data-line="'+(i.id||i.menu_item_id)+'">'+(src?'<div class="order-item-photo"><img loading="eager" decoding="async" src="'+esc(src)+'" alt="'+esc(i.name||i.item_name)+'" onerror="imageFallback(this)"></div>':'<div class="order-item-photo" aria-hidden="true"></div>')+'<div class="order-item-info"><strong>'+esc(i.name||i.item_name)+' × '+i.quantity+'</strong><span class="muted">'+money(i.price||i.unit_price)+' each</span></div><span class="order-item-price" data-line-total>'+money((i.price||i.unit_price)*i.quantity)+'</span>'+(editing?'<div class="qty"><button aria-label="Decrease quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',-1)">−</button><strong data-quantity>'+i.quantity+'</strong><button aria-label="Increase quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',1)">+</button></div>':'')+'</div>'}).join("")+'</div>'+
-  (editing?'<div class="edit-order-actions" style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px"><button class="liquid-btn" style="width:100%" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button><button class="primary" style="width:100%;min-height:50px" data-confirm-edit="'+o.id+'" onclick="confirmOrderEdit(this.dataset.confirmEdit)"><span>Place updated order →</span></button></div>':'')+
+  (editing?'<div class="edit-order-actions" style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px"><button class="liquid-btn" style="width:100%" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button><button class="primary" style="width:100%;min-height:50px" data-confirm-edit="'+o.id+'" onclick="confirmOrderEdit(this.dataset.confirmEdit)"><span>Place updated order →</span></button><button class="liquid-btn" style="width:100%" onclick="cancelCustomerEdit(\''+o.id+'\')"><span>Cancel editing</span></button></div>':'')+
   '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px">'+(accepted?'<span class="timer-chip '+(remaining===0?'expired':'')+'" id="timer-'+o.id+'">'+(remaining?'⏱ '+String(Math.floor(remaining/60000)).padStart(2,'0')+':'+String(Math.floor(remaining/1000)%60).padStart(2,'0'):'⏱ Edit window ended')+'</span>':'<span class="timer-chip">Waiting for staff to accept</span>')+
   (editing?'': '<button class="liquid-btn" '+(!accepted||editCount>=5||status==="pending"?'disabled':'')+' onclick="askToEditOrder(\''+o.id+'\','+remaining+')"><span>'+(!accepted?'Waiting for staff to accept':editCount>=5?'Edit limit reached (5/5)':status==="pending"?'Waiting for staff approval':status==="rejected"?'Request edit again':remaining>0?'✦ Edit order':'Request edit')+'</span></button>')+'</div></article>';
  }).join("");
  updateCustomerTimers(orders);
 }
 
-function updateCustomerTimers(orders){if(orderTimer)clearInterval(orderTimer);const tick=()=>{(orders||[]).forEach(o=>{const el=$("timer-"+o.id);if(!el)return;let until=o.accepted_at?new Date(o.accepted_at).getTime()+120000:0;if(customerEditStatus[o.id]==="approved"&&customerApprovalUntil[o.id])until=customerApprovalUntil[o.id];const ms=Math.max(0,until-Date.now());el.classList.toggle("expired",ms===0);el.textContent=ms>0?'⏱ '+String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0'):'⏱ Edit window ended';});};tick();orderTimer=setInterval(tick,1000)}
+function updateCustomerTimers(orders){if(orderTimer)clearInterval(orderTimer);const tick=()=>{(orders||[]).forEach(o=>{const el=$("timer-"+o.id);if(!el)return;let ms;if(o.edit_paused_at!=null)ms=Math.max(0,Number(o.edit_seconds_remaining||0)*1000);else{let until=o.accepted_at?new Date(o.accepted_at).getTime()+120000:0;if(customerEditStatus[o.id]==="approved"&&customerApprovalUntil[o.id])until=customerApprovalUntil[o.id];ms=Math.max(0,until-Date.now())}el.classList.toggle("expired",ms===0);el.textContent=o.edit_paused_at!=null?'⏸ Paused · '+String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0'):ms>0?'⏱ '+String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0'):'⏱ Edit window ended';});};tick();orderTimer=setInterval(tick,1000)}
 async function beginCustomerEdit(orderId){
- const {data:order,error:orderError}=await db.from("orders").select("accepted_at,edit_count,status").eq("id",orderId).eq("table_id",tableId).maybeSingle();
+ const {data:order,error:orderError}=await db.from("orders").select("accepted_at,edit_count,status,edit_paused_at,edit_seconds_remaining").eq("id",orderId).eq("table_id",tableId).maybeSingle();
  if(orderError||!order){notify("Could not open edit mode. Please refresh and try again.","error");return}
  if(Number(order.edit_count||0)>=5){notify("This order has reached the 5-edit limit.","error");await loadCustomerOrders();return}
  const acceptedUntil=order.accepted_at?new Date(order.accepted_at).getTime()+120000:0;
  const approvedUntil=Number(customerApprovalUntil[orderId]||0);
- const allowedUntil=customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now()?approvedUntil:acceptedUntil;
- if(!allowedUntil||Date.now()>allowedUntil){notify("The 2-minute edit window has ended. Request staff approval to edit.","error");await loadCustomerOrders();return}
+ const alreadyPaused=order.edit_paused_at!=null;
+ const allowed=alreadyPaused?(Number(order.edit_seconds_remaining||0)>0||(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())):((customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())||Date.now()<=acceptedUntil);
+ if(!allowed){notify("The 2-minute edit window has ended. Request staff approval to edit.","error");await loadCustomerOrders();return}
+ const {error:pauseError}=await db.rpc("pause_table_order_edit",{p_order_id:orderId,p_table_id:tableId});
+ if(pauseError){notify("Could not pause edit timer: "+pauseError.message,"error");return}
  const {data:items,error:itemError}=await db.from("order_items").select("menu_item_id,item_name,quantity,unit_price").eq("order_id",orderId);
- if(itemError){notify("Could not load order items: "+itemError.message,"error");return}
+ if(itemError){await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});notify("Could not load order items: "+itemError.message,"error");return}
  const draft={};
  (items||[]).forEach(i=>{if(i.menu_item_id)draft[i.menu_item_id]={id:i.menu_item_id,name:i.item_name,quantity:Number(i.quantity)||1,price:Number(i.unit_price)||0}});
- if(!Object.keys(draft).length){notify("No editable items were found in this order.","error");return}
+ if(!Object.keys(draft).length){await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});notify("No editable items were found in this order.","error");return}
  customerDrafts[orderId]=draft;customerEditing[orderId]=true;
- notify("Edit mode enabled. Make changes and confirm before the 2-minute window ends.");
+ notify("Timer paused. Make changes, then place the updated order to restart the 2-minute window.");
+ await loadCustomerOrders();
+}
+async function cancelCustomerEdit(orderId){
+ const {error}=await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});
+ if(error){notify("Could not resume edit timer: "+error.message,"error");return}
+ delete customerDrafts[orderId];delete customerEditing[orderId];
+ notify("Editing cancelled. The remaining timer has resumed.");
  await loadCustomerOrders();
 }
 async function askToEditOrder(id,remaining){
@@ -274,12 +284,12 @@ async function confirmOrderEdit(orderId,confirmed=false){
  const draft=customerDrafts[orderId]||{};
  const changes=Object.values(draft).filter(i=>i.quantity>0).map(i=>({id:i.id,quantity:i.quantity}));
  if(!changes.length){notify("Your updated order must contain at least one item.","error");return}
- const {data:meta,error:metaError}=await db.from("orders").select("edit_count,accepted_at,status").eq("id",orderId).eq("table_id",tableId).maybeSingle();
+ const {data:meta,error:metaError}=await db.from("orders").select("edit_count,accepted_at,status,edit_paused_at,edit_seconds_remaining").eq("id",orderId).eq("table_id",tableId).maybeSingle();
  if(metaError||!meta){notify("Could not verify this order. Refresh the page and try again.","error");return}
  if(Number(meta.edit_count||0)>=5){notify("This order has reached the 5-edit limit.","error");await loadCustomerOrders();return}
  const approvedUntil=Number(customerApprovalUntil[orderId]||0);
  const acceptedUntil=meta.accepted_at?new Date(meta.accepted_at).getTime()+120000:0;
- if(!(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())&&acceptedUntil<Date.now()){notify("The edit window has expired. Request staff approval again.","error");delete customerEditing[orderId];await loadCustomerOrders();return}
+ if(!(meta.edit_paused_at!=null)&&!(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())&&acceptedUntil<Date.now()){notify("The edit window has expired. Request staff approval again.","error");delete customerEditing[orderId];await loadCustomerOrders();return}
  const buttons=[...document.querySelectorAll('[data-confirm-edit="'+orderId+'"]')];buttons.forEach(b=>{b.disabled=true;b.dataset.originalText=b.textContent;b.textContent="Placing updated order…"});
  try{
   const {error}=await db.rpc("apply_table_order_edit",{p_order_id:orderId,p_table_id:tableId,p_changes:changes});
