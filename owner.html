@@ -9,7 +9,7 @@
 </style></head><body>
 <header><div><strong>Thyme <span>& Whisk</span></strong><div class="small">Owner control centre</div></div><button id="logout" class="btn alt hidden">Sign out</button></header>
 <main>
-<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm" onsubmit="return false;"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" type="submit">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
+<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" type="submit">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
 <section id="app" class="hidden"><div class="card"><h1>Restaurant overview</h1><p id="welcome" class="muted">Checking owner access…</p><div class="stats"><div class="stat"><span class="muted">Menu items</span><b id="menuCount">—</b></div><div class="stat"><span class="muted">Active tables</span><b id="tableCount">—</b></div><div class="stat"><span class="muted">Active orders</span><b id="orderCount">—</b></div></div><div id="msg" aria-live="polite"></div></div>
 <div class="grid"><section class="card"><h2>Menu management</h2><p class="muted">Update price or availability. Changes save directly to Supabase.</p><div id="menuArea">Loading menu…</div></section>
 <section class="card"><h2>Table QR links</h2><p class="muted">Each link opens the customer menu for that exact table. Print or create QR codes from these URLs.</p><div id="tablesArea">Loading tables…</div></section></div>
@@ -19,12 +19,17 @@
 const URL="https://savepmyxoctonhjqgdxj.supabase.co";
 const KEY="sb_publishable_JAYqblm99lorQYbwKYDRgg_gFP-cgYo";
 const RESTAURANT="11111111-1111-4111-8111-111111111111";
+if(!window.supabase?.createClient){
+  const msg=document.getElementById("loginMsg");
+  if(msg) msg.innerHTML='<div class="notice err">Login service is still loading. Check your internet connection, then reload this page.</div>';
+  throw new Error("Supabase JavaScript SDK did not load.");
+}
 const db=window.supabase.createClient(URL,KEY);
 const $=id=>document.getElementById(id);
 function say(msg,error=false){$("msg").innerHTML='<div class="notice '+(error?'err':'')+'">'+escapeHtml(msg)+'</div>'}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
-$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const form=e.currentTarget,button=form.querySelector('button[type="submit"]'),email=$("email").value.trim().toLowerCase(),password=$("password").value;button.disabled=true;button.textContent="Signing in…";$("loginMsg").innerHTML='<div class="notice">Checking your account…</div>';try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw new Error(error.message);if(!data?.user)throw new Error("Supabase did not return a signed-in user. Please try again.");await boot()}catch(err){$("loginMsg").innerHTML='<div class="notice err">'+escapeHtml(err?.message||"Login failed. Check your connection and try again.")+'</div>'}finally{button.disabled=false;button.textContent="Sign in"}});
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();e.stopPropagation();const form=e.currentTarget,button=form.querySelector('button[type="submit"]'),email=$("email").value.trim().toLowerCase(),password=$("password").value;button.disabled=true;button.textContent="Signing in…";$("loginMsg").innerHTML='<div class="notice">Checking your account…</div>';try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw new Error(error.message);if(!data?.user)throw new Error("Supabase did not return a signed-in user. Please try again.");await boot()}catch(err){$("loginMsg").innerHTML='<div class="notice err">'+escapeHtml(err?.message||"Login failed. Check your connection and try again.")+'</div>'}finally{button.disabled=false;button.textContent="Sign in"}});
 $("logout").addEventListener("click",async()=>{await db.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden")});
 async function boot(){try{const {data:{session},error:sessionError}=await db.auth.getSession();if(sessionError)throw sessionError;if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}
 const {data:member,error}=await db.from("staff_members").select("role,display_name,is_active").eq("user_id",session.user.id).eq("restaurant_id",RESTAURANT).maybeSingle();
