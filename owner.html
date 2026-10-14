@@ -9,7 +9,7 @@
 </style></head><body>
 <header><div><strong>Thyme <span>& Whisk</span></strong><div class="small">Owner control centre</div></div><button id="logout" class="btn alt hidden">Sign out</button></header>
 <main>
-<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="signInButton" class="btn" type="button" onclick="loginNow()">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
+<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="signInButton" class="btn" type="button">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
 <section id="app" class="hidden"><div class="card"><h1>Restaurant overview</h1><p id="welcome" class="muted">Checking owner access…</p><div class="stats"><div class="stat"><span class="muted">Menu items</span><b id="menuCount">—</b></div><div class="stat"><span class="muted">Active tables</span><b id="tableCount">—</b></div><div class="stat"><span class="muted">Active orders</span><b id="orderCount">—</b></div></div><div id="msg" aria-live="polite"></div></div>
 <div class="grid"><section class="card"><h2>Menu management</h2><p class="muted">Update price or availability. Changes save directly to Supabase.</p><div id="menuArea">Loading menu…</div></section>
 <section class="card"><h2>Table QR links</h2><p class="muted">Each link opens the customer menu for that exact table. Print or create QR codes from these URLs.</p><div id="tablesArea">Loading tables…</div></section></div>
@@ -79,4 +79,41 @@ async function loadStaff(){const {data,error}=await db.functions.invoke("owner-s
 
 db.auth.onAuthStateChange((_event,session)=>{if(!session){$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden")}});
 boot();
-</script></body></html>
+</script>
+<script>
+(function(){
+ const button=document.getElementById("signInButton");
+ const msg=document.getElementById("loginMsg");
+ const emailInput=document.getElementById("email");
+ const passwordInput=document.getElementById("password");
+ if(!button||!msg||!emailInput||!passwordInput)return;
+ button.addEventListener("click",async function(){
+  const email=emailInput.value.trim().toLowerCase(), password=passwordInput.value;
+  if(!email||!password){msg.innerHTML='<div class="notice err">Enter both your email and password.</div>';return}
+  button.disabled=true;button.textContent="Signing in…";
+  msg.innerHTML='<div class="notice">Button is working. Connecting to login service…</div>';
+  try{
+   let sdk=window.supabase;
+   if(!sdk||!sdk.createClient){
+    await new Promise((resolve,reject)=>{
+     const script=document.createElement("script");
+     script.src="https://unpkg.com/@supabase/supabase-js@2";
+     script.onload=resolve;script.onerror=()=>reject(new Error("Login service could not load. Check internet connection and reload."));
+     document.head.appendChild(script);
+    });
+    sdk=window.supabase;
+   }
+   if(!sdk||!sdk.createClient)throw new Error("Login service did not load. Please reload the page.");
+   const client=sdk.createClient("https://savepmyxoctonhjqgdxj.supabase.co","sb_publishable_JAYqblm99lorQYbwKYDRgg_gFP-cgYo");
+   const {data,error}=await client.auth.signInWithPassword({email,password});
+   if(error)throw new Error(error.message);
+   if(!data||!data.user)throw new Error("Sign-in did not return an account. Try again.");
+   msg.innerHTML='<div class="notice">Signed in. Opening owner dashboard…</div>';
+   window.location.href=window.location.pathname+"?loginfix="+Date.now();
+  }catch(error){
+   msg.innerHTML='<div class="notice err">'+String(error&&error.message||"Login failed.").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</div>';
+  }finally{button.disabled=false;button.textContent="Sign in"}
+ });
+})();
+</script>
+</body></html>
