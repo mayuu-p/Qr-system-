@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#14231d"><title>Thyme & Whisk · Owner</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:light;--ink:#14231d;--green:#1f6749;--lime:#d9ef9a;--bg:#f4f7f2;--line:#e0e7df;--muted:#68766e}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Inter,system-ui,Arial,sans-serif}header{background:var(--ink);color:white;padding:20px clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:2}header strong{font-size:20px}header span{color:var(--lime)}main{max-width:1300px;margin:auto;padding:24px clamp(12px,3vw,32px) 60px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 10px 30px #14231d08}h1,h2{margin:0 0 12px}h1{font-size:clamp(25px,4vw,36px)}h2{font-size:22px}.muted{color:var(--muted);font-size:13px}.field{display:grid;gap:6px;margin:12px 0}.field input,.field select{width:100%;padding:12px;border:1px solid #cfd8cf;border-radius:10px;font:inherit}.btn{border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:750;cursor:pointer;background:var(--green);color:white}.btn.alt{background:#edf3e8;color:var(--ink);border:1px solid var(--line)}.btn:disabled{opacity:.5}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.hidden{display:none!important}.notice{padding:12px 14px;border-radius:10px;background:#e7f4e7;margin:12px 0;overflow-wrap:anywhere}.notice.err{background:#fee9e7;color:#8c1d14}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{background:#f7faf5;border:1px solid var(--line);border-radius:13px;padding:14px}.stat b{font-size:25px;display:block}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.status{font-size:12px;border-radius:20px;padding:5px 9px;background:#e8f5dc}.status.off{background:#fee9e7}.small{font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}@media(max-width:700px){.grid,.stats{grid-template-columns:1fr}header{padding:15px}main{padding-top:15px}.card{padding:15px}}a{color:inherit}
 </style></head><body>
 <header><div><strong>Thyme <span>& Whisk</span></strong><div class="small">Owner control centre</div></div><button id="logout" class="btn alt hidden">Sign out</button></header>
 <main>
-<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="signInButton" class="btn" type="button">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
+<section id="login" class="card" style="max-width:480px;margin:5vh auto"><h1>Owner login</h1><p class="muted">Sign in with the restaurant owner account.</p><form id="loginForm"><div class="field"><label for="email">Owner email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" type="submit">Sign in</button></form><div id="loginMsg" aria-live="polite"></div></section>
 <section id="app" class="hidden"><div class="card"><h1>Restaurant overview</h1><p id="welcome" class="muted">Checking owner access…</p><div class="stats"><div class="stat"><span class="muted">Menu items</span><b id="menuCount">—</b></div><div class="stat"><span class="muted">Active tables</span><b id="tableCount">—</b></div><div class="stat"><span class="muted">Active orders</span><b id="orderCount">—</b></div></div><div id="msg" aria-live="polite"></div></div>
 <div class="grid"><section class="card"><h2>Menu management</h2><p class="muted">Update price or availability. Changes save directly to Supabase.</p><div id="menuArea">Loading menu…</div></section>
 <section class="card"><h2>Table QR links</h2><p class="muted">Each link opens the customer menu for that exact table. Print or create QR codes from these URLs.</p><div id="tablesArea">Loading tables…</div></section></div>
@@ -19,53 +19,20 @@
 const SUPABASE_URL="https://savepmyxoctonhjqgdxj.supabase.co";
 const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhdmVwbXl4b2N0b25oanFnZHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NzMwNDYsImV4cCI6MjEwNzQ0OTA0Nn0.vQxgO7P_NnubsIinP8P81aD3esi_xJ6udwO0DEgu5Dc";
 const RESTAURANT="11111111-1111-4111-8111-111111111111";
-if(!window.supabase?.createClient){
-  const msg=document.getElementById("loginMsg");
-  if(msg) msg.innerHTML='<div class="notice err">Login service is still loading. Check your internet connection, then reload this page.</div>';
-  throw new Error("Supabase JavaScript SDK did not load.");
-}
 const db=window.supabase.createClient(SUPABASE_URL,KEY);
 const $=id=>document.getElementById(id);
 function say(msg,error=false){$("msg").innerHTML='<div class="notice '+(error?'err':'')+'">'+escapeHtml(msg)+'</div>'}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
-async function loginNow(){
- const button=$("signInButton");
- const email=$("email").value.trim().toLowerCase();
- const password=$("password").value;
- const msg=$("loginMsg");
- if(!email||!password){msg.innerHTML='<div class="notice err">Enter both your owner email and password.</div>';return}
- button.disabled=true;button.textContent="Signing in…";
- msg.innerHTML='<div class="notice">Login button is working. Connecting to secure sign-in…</div>';
- try{
-  if(!window.supabase?.createClient) throw new Error("Login service did not load. Check internet and reload.");
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error) throw new Error(error.message);
-  if(!data?.user) throw new Error("Sign-in did not return a user. Please try again.");
-  await boot();
- }catch(err){
-  msg.innerHTML='<div class="notice err">'+escapeHtml(err?.message||"Login failed. Please try again.")+'</div>';
- }finally{button.disabled=false;button.textContent="Sign in"}
-}
-$("loginForm").addEventListener("submit",e=>{e.preventDefault();loginNow()});
-
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginMsg").textContent="Signing in…";const {error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){$("loginMsg").innerHTML='<div class="notice err">'+escapeHtml(error.message)+'</div>';return}await boot()});
 $("logout").addEventListener("click",async()=>{await db.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden")});
-async function boot(){try{const {data:{session},error:sessionError}=await db.auth.getSession();if(sessionError)throw sessionError;if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}
+async function boot(){const {data:{session}}=await db.auth.getSession();if(!session){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}
 const {data:member,error}=await db.from("staff_members").select("role,display_name,is_active").eq("user_id",session.user.id).eq("restaurant_id",RESTAURANT).maybeSingle();
-if(error)throw new Error("Signed in, but owner access could not be checked: "+error.message);
-if(!member||member.role!=="owner"||member.is_active!==true){await db.auth.signOut();$("loginMsg").innerHTML='<div class="notice err">This email signed in, but its owner membership is missing or inactive. Contact the project administrator.</div>';return}
-$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("loginMsg").innerHTML="";$("welcome").textContent="Signed in as "+(member.display_name||session.user.email)+" · Owner";
+if(error||!member||member.role!=="owner"||member.is_active===false){await db.auth.signOut();$("loginMsg").innerHTML='<div class="notice err">This account does not have active owner access.</div>';return}
+$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("welcome").textContent="Signed in as "+(member.display_name||session.user.email)+" · Owner";
 await Promise.all([loadMenu(),loadTables(),loadOrders(),loadStaff()]);
-}catch(err){$("loginMsg").innerHTML='<div class="notice err">'+escapeHtml(err?.message||"Could not open the owner dashboard. Please refresh and try again.")+'</div>';$("login").classList.remove("hidden");$("app").classList.add("hidden");}}
-async function loadMenu(){
- const area=$("menuArea");
- area.textContent="Loading menu…";
- const {data,error}=await db.from("menu_items").select("id,name,price,category,is_available").eq("restaurant_id",RESTAURANT).order("category").order("name");
- if(error){area.textContent="Menu could not load: "+error.message;return}
- const rows=data||[];$("menuCount").textContent=rows.length;
- area.innerHTML='<div class="tablewrap"><table><thead><tr><th>Item</th><th>Price</th><th>Availability</th><th>Save</th></tr></thead><tbody>'+rows.map(x=>'<tr><td><b>'+escapeHtml(x.name)+'</b><div class="muted">'+escapeHtml(x.category||"")+'</div></td><td><input aria-label="Price" id="price-'+escapeHtml(x.id)+'" type="number" min="0" step=".01" value="'+Number(x.price)+'" style="width:100px;padding:8px;border:1px solid #cfd8cf;border-radius:8px"></td><td><label><input id="avail-'+escapeHtml(x.id)+'" type="checkbox" '+(x.is_available?'checked':'')+'> Available</label></td><td><button type="button" class="btn small" data-save-menu="'+escapeHtml(x.id)+'">Save</button></td></tr>').join("")+'</tbody></table></div>';
- area.querySelectorAll("[data-save-menu]").forEach(button=>button.addEventListener("click",()=>saveMenu(button.dataset.saveMenu)));
 }
+async function loadMenu(){const {data,error}=await db.from("menu_items").select("id,name,price,category,is_available").eq("restaurant_id",RESTAURANT).order("category").order("name");if(error){$("menuArea").textContent=error.message;return}const rows=data||[];$("menuCount").textContent=rows.length;$("menuArea").innerHTML='<div class="tablewrap"><table><thead><tr><th>Item</th><th>Price</th><th>Availability</th><th>Save</th></tr></thead><tbody>'+rows.map(x=>'<tr><td><b>'+escapeHtml(x.name)+'</b><div class="muted">'+escapeHtml(x.category||"")+'</div></td><td><input aria-label="Price for '+escapeHtml(x.name)+'" id="price-'+x.id+'" type="number" min="0" step=".01" value="'+Number(x.price)+'" style="width:100px;padding:8px;border:1px solid #cfd8cf;border-radius:8px"></td><td><label><input id="avail-'+x.id+'" type="checkbox" '+(x.is_available?'checked':'')+'> Available</label></td><td><button class="btn small" onclick="saveMenu(\''+x.id+'\')">Save</button></td></tr>').join("")+'</tbody></table></div>'}
 async function saveMenu(id){const price=Number($("price-"+id).value),is_available=$("avail-"+id).checked;if(!Number.isFinite(price)||price<0){say("Enter a valid non-negative price.",true);return}const {error}=await db.from("menu_items").update({price,is_available}).eq("id",id).eq("restaurant_id",RESTAURANT);if(error){say("Menu save failed: "+error.message,true);return}say("Menu item updated.");await loadMenu()}
 async function loadTables(){const {data,error}=await db.from("restaurant_tables").select("id,table_number,is_active").eq("restaurant_id",RESTAURANT).order("table_number");if(error){$("tablesArea").textContent=error.message;return}const rows=data||[];$("tableCount").textContent=rows.filter(t=>t.is_active).length;$("tablesArea").innerHTML=rows.map(t=>{const url=location.origin+location.pathname.replace(/owner\.html$/,"")+"?restaurant="+encodeURIComponent(RESTAURANT)+"&table="+encodeURIComponent(t.id);return '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:12px 0;gap:14px"><div style="display:flex;align-items:center;gap:12px;min-width:0"><img alt="QR code for table '+escapeHtml(t.table_number)+'" loading="lazy" width="88" height="88" style="border:1px solid var(--line);border-radius:8px;background:white" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(url)+'"><div><b>Table '+escapeHtml(String(t.table_number).replace(/^0+/,"")||"1")+'</b><div class="muted small">'+(t.is_active?'Active':'Inactive')+'</div><button class="btn alt small" style="margin-top:8px" onclick="copyLink(&quot;'+escapeHtml(url)+'&quot;)">Copy link</button></div></div></div>'}).join("")}
 async function copyLink(url){try{await navigator.clipboard.writeText(url);say("Table link copied. Create a QR code from this link.")}catch{prompt("Copy table link:",url)}}
@@ -79,41 +46,4 @@ async function loadStaff(){const {data,error}=await db.functions.invoke("owner-s
 
 db.auth.onAuthStateChange((_event,session)=>{if(!session){$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden")}});
 boot();
-</script>
-<script>
-(function(){
- const button=document.getElementById("signInButton");
- const msg=document.getElementById("loginMsg");
- const emailInput=document.getElementById("email");
- const passwordInput=document.getElementById("password");
- if(!button||!msg||!emailInput||!passwordInput)return;
- button.addEventListener("click",async function(){
-  const email=emailInput.value.trim().toLowerCase(), password=passwordInput.value;
-  if(!email||!password){msg.innerHTML='<div class="notice err">Enter both your email and password.</div>';return}
-  button.disabled=true;button.textContent="Signing in…";
-  msg.innerHTML='<div class="notice">Button is working. Connecting to login service…</div>';
-  try{
-   let sdk=window.supabase;
-   if(!sdk||!sdk.createClient){
-    await new Promise((resolve,reject)=>{
-     const script=document.createElement("script");
-     script.src="https://unpkg.com/@supabase/supabase-js@2";
-     script.onload=resolve;script.onerror=()=>reject(new Error("Login service could not load. Check internet connection and reload."));
-     document.head.appendChild(script);
-    });
-    sdk=window.supabase;
-   }
-   if(!sdk||!sdk.createClient)throw new Error("Login service did not load. Please reload the page.");
-   const client=sdk.createClient("https://savepmyxoctonhjqgdxj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhdmVwbXl4b2N0b25oanFnZHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NzMwNDYsImV4cCI6MjEwNzQ0OTA0Nn0.vQxgO7P_NnubsIinP8P81aD3esi_xJ6udwO0DEgu5Dc");
-   const {data,error}=await client.auth.signInWithPassword({email,password});
-   if(error)throw new Error(error.message);
-   if(!data||!data.user)throw new Error("Sign-in did not return an account. Try again.");
-   msg.innerHTML='<div class="notice">Signed in. Opening owner dashboard…</div>';
-   window.location.href=window.location.pathname+"?loginfix="+Date.now();
-  }catch(error){
-   msg.innerHTML='<div class="notice err">'+String(error&&error.message||"Login failed.").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</div>';
-  }finally{button.disabled=false;button.textContent="Sign in"}
- });
-})();
-</script>
-</body></html>
+</script></body></html>
