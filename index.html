@@ -226,7 +226,7 @@ async function loadCustomerOrders(){
   const draftRows=editing?Object.values(draft||{}):rows.map(i=>({id:i.menu_item_id,name:i.item_name,quantity:i.quantity,price:i.unit_price}));
   return '<article class="order" data-order-card="'+o.id+'" style="padding:22px;border-radius:20px;animation-delay:'+Math.min(index*60,300)+'ms"><div class="section-head" style="margin-top:0"><div><div class="eyebrow">Order #'+esc(o.order_code||shortCode(o.id))+'</div><h2 style="font-size:22px;margin:5px 0">Table '+esc(tableNumber)+'</h2><span class="order-status-chip status-'+esc(String(o.status||"new").toLowerCase())+'">'+esc(({new:"Waiting for staff",accepted:"Accepted",preparing:"Preparing",ready:"Ready",served:"Served",cancelled:"Cancelled"})[String(o.status||"new").toLowerCase()]||o.status)+'</span></div><strong data-order-total style="font-size:22px">'+money(editing?draftRows.reduce((s,i)=>s+i.price*i.quantity,0):o.total)+'</strong></div>'+
   '<div class="order-items-grid">'+draftRows.map(i=>{const imgItem=menuItems.find(m=>m.id===(i.id||i.menu_item_id));const src=imgItem?imageFor(imgItem):"";return '<div class="order-item" data-line="'+(i.id||i.menu_item_id)+'">'+(src?'<div class="order-item-photo"><img loading="eager" decoding="async" src="'+esc(src)+'" alt="'+esc(i.name||i.item_name)+'" onerror="imageFallback(this)"></div>':'<div class="order-item-photo" aria-hidden="true"></div>')+'<div class="order-item-info"><strong>'+esc(i.name||i.item_name)+' × '+i.quantity+'</strong><span class="muted">'+money(i.price||i.unit_price)+' each</span></div><span class="order-item-price" data-line-total>'+money((i.price||i.unit_price)*i.quantity)+'</span>'+(editing?'<div class="qty"><button aria-label="Decrease quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',-1)">−</button><strong data-quantity>'+i.quantity+'</strong><button aria-label="Increase quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',1)">+</button></div>':'')+'</div>'}).join("")+'</div>'+
-  (editing?'<button class="liquid-btn" style="width:100%;margin-top:10px" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button>':'')+
+  (editing?'<div class="edit-order-actions" style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px"><button class="liquid-btn" style="width:100%" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button><button class="primary" style="width:100%;min-height:50px" data-confirm-edit="'+o.id+'" onclick="confirmOrderEdit(this.dataset.confirmEdit)"><span>Place updated order →</span></button></div>':'')+
   '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px">'+(accepted?'<span class="timer-chip '+(remaining===0?'expired':'')+'" id="timer-'+o.id+'">'+(remaining?'⏱ '+String(Math.floor(remaining/60000)).padStart(2,'0')+':'+String(Math.floor(remaining/1000)%60).padStart(2,'0'):'⏱ Edit window ended')+'</span>':'<span class="timer-chip">Waiting for staff to accept</span>')+
   (editing?'': '<button class="liquid-btn" '+(!accepted||editCount>=5||status==="pending"?'disabled':'')+' onclick="askToEditOrder(\''+o.id+'\','+remaining+')"><span>'+(!accepted?'Waiting for staff to accept':editCount>=5?'Edit limit reached (5/5)':status==="pending"?'Waiting for staff approval':status==="rejected"?'Request edit again':remaining>0?'✦ Edit order':'Request edit')+'</span></button>')+'</div></article>';
  }).join("");
@@ -269,15 +269,26 @@ async function askToEditOrder(id,remaining){
 }
 function draftOrderQty(orderId,menuId,delta){const draft=customerDrafts[orderId];if(!draft||!draft[menuId])return;const next=draft[menuId].quantity+delta;if(next>50)return;if(next<=0)delete draft[menuId];else draft[menuId].quantity=next;const card=document.querySelector(`[data-order-card="${orderId}"]`);if(card){const row=card.querySelector(`[data-line="${menuId}"]`);if(row){if(!draft[menuId])row.remove();else{const q=row.querySelector("[data-quantity]");if(q)q.textContent=String(draft[menuId].quantity);const line=row.querySelector("[data-line-total]");if(line)line.textContent=money(draft[menuId].price*draft[menuId].quantity)}}const total=Object.values(draft).reduce((s,i)=>s+i.price*i.quantity,0);const totalEl=card.querySelector("[data-order-total]");if(totalEl)totalEl.textContent=money(total);const confirm=card.querySelector("[data-confirm-edit]");if(confirm)confirm.disabled=!Object.values(draft).some(i=>i.quantity>0)}if(!Object.values(draft).length)notify("Order must contain at least one item.","error")}
 function draftAddItem(orderId){const sel=$("add-item-"+orderId);if(!sel)return;const item=menuItems.find(m=>m.id===sel.value);if(!item)return;const draft=customerDrafts[orderId]||(customerDrafts[orderId]={});if(!draft[item.id])draft[item.id]={id:item.id,name:item.name,quantity:0,price:Number(item.price)};if(draft[item.id].quantity>=50)return notify("Maximum quantity is 50.","error");draft[item.id].quantity++;const card=document.querySelector(`[data-order-card="${orderId}"]`);const row=card?.querySelector(`[data-line="${item.id}"]`);if(row){const q=row.querySelector("[data-quantity]");if(q)q.textContent=String(draft[item.id].quantity);const line=row.querySelector("[data-line-total]");if(line)line.textContent=money(draft[item.id].price*draft[item.id].quantity);const totalEl=card.querySelector("[data-order-total]");if(totalEl)totalEl.textContent=money(Object.values(draft).reduce((s,i)=>s+i.price*i.quantity,0))}else loadCustomerOrders()}
-async function confirmOrderEdit(orderId){
- const draft=customerDrafts[orderId]||{};const changes=Object.values(draft).filter(i=>i.quantity>0).map(i=>({id:i.id,quantity:i.quantity}));
- if(!changes.length){notify("Order must contain at least one item.","error");return}
- const {data:meta}=await db.from("orders").select("edit_count").eq("id",orderId).maybeSingle();if(Number(meta?.edit_count||0)>=5){notify("This order has reached the 5-edit limit.","error");return}
- const btns=document.querySelectorAll("button");btns.forEach(b=>{if(b.textContent.includes("Confirm edit"))b.disabled=true});
- const {error}=await db.rpc("apply_table_order_edit",{p_order_id:orderId,p_table_id:tableId,p_changes:changes});
- btns.forEach(b=>{if(b.textContent.includes("Confirm edit"))b.disabled=false});
- if(error){notify("Edit was not saved: "+error.message,"error");return}
- delete customerDrafts[orderId];delete customerEditing[orderId];delete customerApprovalUntil[orderId];notify("All changes confirmed and sent to staff together.");await loadCustomerOrders()
+async function confirmOrderEdit(orderId,confirmed=false){
+ if(!confirmed){pendingModalAction=()=>confirmOrderEdit(orderId,true);showModal("Place updated order?","Save these quantity changes to the existing order and send the updated items and total to the staff dashboard?","Place updated order");return}
+ const draft=customerDrafts[orderId]||{};
+ const changes=Object.values(draft).filter(i=>i.quantity>0).map(i=>({id:i.id,quantity:i.quantity}));
+ if(!changes.length){notify("Your updated order must contain at least one item.","error");return}
+ const {data:meta,error:metaError}=await db.from("orders").select("edit_count,accepted_at,status").eq("id",orderId).eq("table_id",tableId).maybeSingle();
+ if(metaError||!meta){notify("Could not verify this order. Refresh the page and try again.","error");return}
+ if(Number(meta.edit_count||0)>=5){notify("This order has reached the 5-edit limit.","error");await loadCustomerOrders();return}
+ const approvedUntil=Number(customerApprovalUntil[orderId]||0);
+ const acceptedUntil=meta.accepted_at?new Date(meta.accepted_at).getTime()+120000:0;
+ if(!(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())&&acceptedUntil<Date.now()){notify("The edit window has expired. Request staff approval again.","error");delete customerEditing[orderId];await loadCustomerOrders();return}
+ const buttons=[...document.querySelectorAll('[data-confirm-edit="'+orderId+'"]')];buttons.forEach(b=>{b.disabled=true;b.dataset.originalText=b.textContent;b.textContent="Placing updated order…"});
+ try{
+  const {error}=await db.rpc("apply_table_order_edit",{p_order_id:orderId,p_table_id:tableId,p_changes:changes});
+  if(error)throw error;
+  delete customerDrafts[orderId];delete customerEditing[orderId];delete customerApprovalUntil[orderId];
+  notify("Updated order placed. Staff dashboard will refresh automatically.");
+  await loadCustomerOrders();
+ }catch(error){notify("Updated order was not saved: "+(error?.message||"Please try again."),"error")}
+ finally{buttons.forEach(b=>{b.disabled=false;b.textContent="Place updated order →"})}
 }
 function backToMenu(){location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)}
 
