@@ -437,7 +437,7 @@ body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overf
 .checkout-page #cartRows{flex:1 1 auto!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
 .checkout-page .add-more-btn{flex:0 0 auto!important;margin-top:12px!important}
 .checkout-page .checkout-summary{position:sticky!important;top:12px!important;align-self:start!important;max-height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;scrollbar-gutter:stable!important}
-#appModal.modal-backdrop{position:fixed!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important}
+#appModal.modal-backdrop{position:fixed!important;inset:0!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important}#appModal.modal-backdrop:not(.hidden){display:flex!important}#appModal.modal-backdrop.hidden{display:none!important;pointer-events:none!important}
 #appModal .modal-card{max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;margin:auto!important}
 @media(max-width:760px){
  .checkout-page{height:100dvh!important;overflow:hidden!important}
