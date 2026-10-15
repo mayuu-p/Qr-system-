@@ -130,6 +130,45 @@ main{width:100%;max-width:1720px;padding-left:clamp(12px,2.2vw,34px);padding-rig
 #notice:not(.hidden){position:fixed!important;right:14px!important;bottom:14px!important;top:auto!important;left:auto!important;z-index:9998!important;width:max-content;max-width:min(340px,calc(100vw - 28px));margin:0!important;box-shadow:0 8px 28px rgba(15,23,42,.2)}
 @media(max-width:480px){#notice:not(.hidden){right:10px!important;bottom:10px!important;max-width:calc(100vw - 20px)}}
  .unavailable-pill{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border-radius:999px;background:#fff0ef;color:#b42318;border:1px solid #fecaca;font-size:11px;font-weight:800;white-space:nowrap}.card:has(.unavailable-pill) .photo:after{content:"UNAVAILABLE";position:absolute;top:12px;right:10px;background:#b42318;color:white;padding:5px 8px;border-radius:7px;font-size:9px;font-weight:900;letter-spacing:.06em}.card .photo{position:relative}html,body{overscroll-behavior:none;touch-action:pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+/* Stable app-like checkout: only the item list scrolls. */
+.checkout-page main{height:calc(100dvh - 70px);min-height:0;overflow:hidden;padding:10px 12px}
+.checkout-page .checkout-panel{display:flex!important;flex-direction:column;height:100%;min-height:0;overflow:hidden;padding:clamp(14px,2vw,26px)}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto}
+.checkout-page .checkout-heading{margin:14px 0}
+.checkout-page .checkout-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);flex:1 1 auto;height:auto!important;min-height:0;overflow:hidden;gap:18px;align-items:stretch}
+.checkout-page .checkout-items-wrap{display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:18px}
+.checkout-page .checkout-items-wrap>.checkout-section-title,.checkout-page .add-more-btn{flex:0 0 auto}
+.checkout-page #cartRows{display:block;flex:1 1 0%;height:0;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;padding:0 12px 0 0;overflow-anchor:none}
+.checkout-page .checkout-summary{position:static;align-self:stretch;min-width:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px}
+.checkout-page .cart-row{min-height:68px;padding:14px 0}
+.checkout-page #cartRows::-webkit-scrollbar{width:8px}
+.checkout-page #cartRows::-webkit-scrollbar-thumb{background:#c8d8c8;border-radius:20px;border:2px solid #fff}
+.orders-page #customerOrdersList,.staff-order-grid{overflow-anchor:none}
+.orders-page #customerOrdersList>.order,.staff-order-grid>.order{animation:none!important;overflow-anchor:none}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 64px);padding:7px 7px 9px}
+ .checkout-page .checkout-panel{padding:12px 10px;border-radius:18px}
+ .checkout-page .checkout-top{padding-bottom:9px}
+ .checkout-page .checkout-heading{margin:10px 0;gap:8px}
+ .checkout-page .checkout-heading h2{font-size:26px}
+ .checkout-page .checkout-heading p{font-size:11px}
+ .checkout-page .checkout-step{font-size:8px;letter-spacing:.8px}
+ .checkout-page .checkout-layout{display:flex;flex-direction:column;gap:9px}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%;height:auto;min-height:95px;padding:11px}
+ .checkout-page #cartRows{flex:1 1 0%;height:0;min-height:0;padding-right:12px;touch-action:pan-y}
+ .checkout-page .checkout-summary{flex:0 0 auto;max-height:43%;overflow-y:auto;padding:9px 12px}
+ .checkout-page .checkout-section-title{font-size:12px;margin-bottom:6px}
+ .checkout-page .summary-line{padding:4px 0;font-size:11px}
+ .checkout-page .total-row{padding:7px 0;font-size:15px}
+ .checkout-page .field{margin:5px 0}
+ .checkout-page .field label{font-size:9px}
+ .checkout-page .field input{padding:8px}
+ .checkout-page .checkout-submit{min-height:38px;padding:8px 11px;font-size:12px}
+ .checkout-page .checkout-trust{font-size:9px;margin-top:4px}
+ .checkout-page .add-more-btn{padding:7px;margin-top:7px}
+ .checkout-page .cart-row{min-height:60px;padding:10px 0}
+}
 </style>
 </head>
 <body>
@@ -216,10 +255,10 @@ async function loadCustomerOrders(){
  const {data:orders,error}=await db.from("orders").select("id,order_code,customer_name,status,total,created_at,accepted_at,edit_count,edit_paused_at,edit_seconds_remaining").eq("restaurant_id",restaurantId).eq("table_id",tableId).not("status","in","(served,cancelled)").order("created_at",{ascending:false});
  if(error){box.innerHTML='<p class="muted">Orders could not load: '+esc(error.message)+'</p>';return}
  $("customerOrdersCount").textContent=orders&&orders.length?"("+orders.length+")":"";$("customerOrdersBtn").classList.toggle("hidden",!orders||orders.length===0);
- if(!orders||!orders.length){box.innerHTML='<div class="order"><strong>No active orders yet</strong><p class="muted">Place an order and it will appear here.</p></div>';return}
+ if(!orders||!orders.length){const emptySignature="empty:"+JSON.stringify(orders||[]);if(window.__customerOrdersSignature!==emptySignature){window.__customerOrdersSignature=emptySignature;box.innerHTML='<div class="order"><strong>No active orders yet</strong><p class="muted">Place an order and it will appear here.</p></div>'}return}
  const {data:items,error:itemError}=await db.from("order_items").select("id,order_id,menu_item_id,item_name,quantity,unit_price").in("order_id",orders.map(o=>o.id));
  if(itemError){box.innerHTML='<p class="muted">Order items could not load: '+esc(itemError.message)+'</p>';return}
- const summaryPairs=await Promise.all(orders.map(async o=>{const {data,error}=await db.rpc("get_table_order_edit_summary",{p_order_id:o.id,p_table_id:tableId});return [o.id,(!error&&data)?data:{requests_used:0,requests_remaining:3,last_status:"none"}]}));const editSummaryByOrder=Object.fromEntries(summaryPairs);orders.forEach(o=>{const r=editSummaryByOrder[o.id]||{};customerEditStatus[o.id]=r.last_status||"none";customerApprovalUntil[o.id]=r.approved_until?new Date(r.approved_until).getTime():0;customerRequestUsage[o.id]=Number(r.requests_used||0);customerApprovalStaff[o.id]={title:r.staff_title||"",name:r.staff_name||""}});
+ const summaryPairs=await Promise.all(orders.map(async o=>{const {data,error}=await db.rpc("get_table_order_edit_summary",{p_order_id:o.id,p_table_id:tableId});return [o.id,(!error&&data)?data:{requests_used:0,requests_remaining:3,last_status:"none"}]}));const editSummaryByOrder=Object.fromEntries(summaryPairs);orders.forEach(o=>{const r=editSummaryByOrder[o.id]||{};customerEditStatus[o.id]=r.last_status||"none";customerApprovalUntil[o.id]=r.approved_until?new Date(r.approved_until).getTime():0;customerRequestUsage[o.id]=Number(r.requests_used||0);customerApprovalStaff[o.id]={title:r.staff_title||"",name:r.staff_name||""}});const customerSignature=JSON.stringify({orders,items,editSummaryByOrder});if(window.__customerOrdersSignature===customerSignature){updateCustomerTimers(orders);return}window.__customerOrdersSignature=customerSignature;
  const toolbar='<div class="orders-toolbar"><div><div class="eyebrow">Live order tracking</div><p class="muted" style="margin:5px 0 0">Table '+esc(tableNumber)+' · Your food status updates live</p></div></div>';
  box.innerHTML=toolbar+orders.map((o,index)=>{
   const accepted=o.accepted_at?new Date(o.accepted_at).getTime():null;
