@@ -30,6 +30,50 @@ html,body{overscroll-behavior:none;overscroll-behavior-y:none;overscroll-behavio
 html,body{overscroll-behavior:none;touch-action:pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 .payment-settings-panel{margin-top:18px}.payment-method-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 22px}.payment-method-options .toggle{padding:13px;border:1px solid var(--line);border-radius:13px;background:#fbfcf9}.payment-preview{border:1px solid var(--line);border-radius:15px;padding:14px;margin:16px 0;background:#f8faf6}.payment-preview-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px}.payment-preview-head span,.payment-preview-body small{color:var(--muted)}.payment-preview-body{display:flex;align-items:center;gap:12px;margin-top:14px}.payment-preview-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#e4f4e8;color:#176947;font-size:22px;font-weight:900}.payment-preview-body small{display:block;margin-top:4px}@media(max-width:650px){.payment-method-options{grid-template-columns:1fr}.payment-method-options .toggle{padding:10px}}
+
+/* App-like responsive shell: one natural page scroller, no clipped panels */
+html{min-height:100%;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;overscroll-behavior-y:contain}
+#app{min-height:100dvh}
+.layout{min-height:calc(100dvh - 76px);align-items:stretch}
+.layout>aside{position:sticky;top:76px;align-self:start;height:calc(100dvh - 76px);overflow-y:auto;overscroll-behavior:contain}
+.main{min-width:0;width:100%;max-width:none;margin:0;padding:clamp(14px,2vw,30px);padding-bottom:clamp(22px,3vw,40px)}
+.page{min-width:0;max-width:1600px;margin:0 auto}
+.panel,.metric{min-width:0}
+.panel{overflow-wrap:anywhere}
+#page-orders{min-width:0}
+#page-orders .panel{overflow-x:auto}
+#orderRows{min-width:720px}
+#page-staff .panel{min-width:0}
+#page-settings .form-grid{align-items:start}
+#page-settings input{max-width:100%;min-width:0}
+#page-settings .payment-settings-panel{overflow:visible}
+#menuModal .modal-card,#staffEditModal .modal-card{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+@media(max-width:700px){
+ .layout{display:block;min-height:calc(100dvh - 64px)}
+ .layout>aside{display:none}
+ .main{padding:12px 10px calc(92px + env(safe-area-inset-bottom))}
+ .page-head{align-items:flex-start;gap:10px;margin-bottom:14px}
+ .page-head h1{font-size:clamp(21px,6vw,27px)}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .metric{padding:12px;min-height:96px}
+ .panel{margin-bottom:12px}
+ .panel-head{gap:8px;flex-wrap:wrap}
+ .actions{flex-wrap:wrap}
+ .actions .btn,.actions select{max-width:100%}
+ .form-grid{grid-template-columns:minmax(0,1fr)}
+ .form-field,.form-field input,.form-field select{min-width:0;max-width:100%}
+ .payment-method-options{grid-template-columns:minmax(0,1fr)}
+ .payment-method-options .toggle{padding:10px}
+ .mobile-nav{padding-bottom:calc(6px + env(safe-area-inset-bottom));overflow-x:auto;overscroll-behavior:contain}
+ .mobile-nav button{min-width:0;flex:1 0 0;white-space:nowrap}
+ #page-orders .panel{padding:10px}
+ #orderRows{min-width:720px}
+ #menuModal .modal-card,#staffEditModal .modal-card{width:calc(100vw - 20px);max-width:520px;margin:10px auto;border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
