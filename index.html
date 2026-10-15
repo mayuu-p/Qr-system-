@@ -1259,6 +1259,45 @@ body:not(.checkout-page) *{touch-action:pan-y}
   body.checkout-page #cartPanel .checkout-heading{width:100%!important;margin:0 0 12px!important}
   body.checkout-page #cartPanel .checkout-items-wrap{width:100%!important;max-width:100%!important;margin-top:0!important}
 }
+
+/* Structural grid fix: Order Summary is the first row of the checkout grid,
+   flush with the bottom of the site header, without positional offsets. */
+@media(min-width:761px){
+ body.checkout-page{height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+ body.checkout-page main{
+  width:100%!important;max-width:none!important;margin:0!important;
+  padding:0!important;height:auto!important;min-height:calc(100dvh - 88px)!important;overflow:visible!important;
+ }
+ body.checkout-page #cartPanel.checkout-panel{
+  display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(340px,1fr)!important;
+  grid-template-rows:auto auto minmax(0,1fr)!important;
+  column-gap:18px!important;row-gap:0!important;
+  position:relative!important;top:0!important;margin:0!important;padding:0 16px 16px!important;
+  width:100%!important;max-width:none!important;height:auto!important;min-height:calc(100dvh - 88px)!important;
+  border:0!important;border-radius:0!important;overflow:visible!important;box-sizing:border-box!important;
+ }
+ body.checkout-page #cartPanel .checkout-top{
+  grid-column:1!important;grid-row:1!important;margin:0!important;padding:14px 0 10px!important;
+ }
+ body.checkout-page #cartPanel .checkout-heading{
+  grid-column:1!important;grid-row:2!important;width:100%!important;margin:12px 0!important;padding:0!important;
+ }
+ body.checkout-page #cartPanel .checkout-layout{display:contents!important}
+ body.checkout-page #cartPanel .checkout-items-wrap{
+  grid-column:1!important;grid-row:3!important;
+  width:100%!important;max-width:100%!important;margin:0!important;
+  height:auto!important;max-height:none!important;overflow:visible!important;
+ }
+ body.checkout-page #cartPanel .checkout-summary{
+  grid-column:2!important;grid-row:1 / 4!important;
+  position:static!important;top:auto!important;right:auto!important;left:auto!important;
+  transform:none!important;align-self:start!important;
+  width:100%!important;max-width:100%!important;
+  margin:0!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;z-index:auto!important;border-radius:0 0 16px 16px!important;
+ }
+ body.checkout-page #cartPanel #cartRows{height:auto!important;max-height:52dvh!important;overflow-y:auto!important}
+}
 </style>
 </head>
 <body>
