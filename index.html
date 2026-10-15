@@ -975,9 +975,9 @@ body:not(.checkout-page) *{touch-action:pan-y}
  .checkout-page .checkout-items-wrap{max-height:none!important;overflow:hidden!important}
  .checkout-page #cartRows{max-height:42dvh!important;overflow-y:auto!important}
 }
-/* FIX: Remove conflicting top offsets and max-height constraints to prevent clipping of the summary card */
+/* FIX: Align summary at top and remove height restrictions that clip the QR code and buttons */
 .checkout-page .checkout-layout{
-  top:0!important;margin-top:0!important;
+  position:relative!important;top:0!important;margin-top:0!important;
   grid-template-columns:minmax(0,1.55fr) minmax(340px,.95fr)!important;
   align-items:start!important;overflow:visible!important;
 }
@@ -1001,7 +1001,6 @@ body:not(.checkout-page) *{touch-action:pan-y}
  .checkout-page .checkout-items-wrap{max-height:none!important;overflow:hidden!important}
  .checkout-page #cartRows{max-height:42dvh!important;overflow-y:auto!important}
 }
-/* Final CSS cleanup */
 </style>
 </head>
 <body>
