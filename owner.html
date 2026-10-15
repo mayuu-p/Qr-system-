@@ -74,6 +74,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
  #menuModal .modal-card,#staffEditModal .modal-card{width:calc(100vw - 20px);max-width:520px;margin:10px auto;border-radius:18px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Final scrolling fix: one smooth workspace scroller, no trapped page sections */
+html{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important;scroll-behavior:smooth!important}
+body{height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important}
+#app{height:auto!important;min-height:100dvh!important;overflow:visible!important}
+.top{position:sticky!important;top:0!important;z-index:30!important}
+.layout{display:grid!important;grid-template-columns:235px minmax(0,1fr)!important;height:auto!important;min-height:calc(100dvh - 76px)!important;overflow:visible!important;align-items:stretch!important}
+.layout>aside{position:sticky!important;top:76px!important;align-self:start!important;height:calc(100dvh - 76px)!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-width:thin!important}
+.layout>.main{height:auto!important;min-height:calc(100dvh - 76px)!important;overflow:visible!important;overflow-x:hidden!important;overscroll-behavior:initial!important;scrollbar-width:thin!important;scroll-behavior:smooth!important}
+.page{min-height:0!important;overflow:visible!important}
+.panel,.metric{overflow:visible}
+.table-wrap{max-width:100%;overflow-x:auto!important;overflow-y:visible!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;scrollbar-width:thin!important}
+.table-wrap table{margin-bottom:1px}
+#page-staff,#page-settings,#page-menu,#page-orders,#page-tables,#page-overview{height:auto!important;max-height:none!important;overflow:visible!important}
+.form-grid,.payment-settings-panel,.payment-method-options{min-height:0!important;overflow:visible!important}
+.modal{overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;align-items:start!important}
+.modal-card{max-height:calc(100dvh - 32px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+.mobile-nav{overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+@media(min-width:701px){
+ .layout{grid-template-columns:235px minmax(0,1fr)!important}
+ .layout>.main{padding:clamp(14px,2vw,30px)!important;padding-bottom:40px!important}
+}
+@media(max-width:700px){
+ html,body{height:auto!important;overflow-x:hidden!important;overflow-y:auto!important}
+ #app{height:auto!important;min-height:100dvh!important;overflow:visible!important}
+ .layout{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}
+ .layout>aside{display:none!important}
+ .layout>.main{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;padding:12px 10px calc(100px + env(safe-area-inset-bottom))!important}
+ .page{height:auto!important;max-height:none!important;overflow:visible!important}
+ .panel{overflow:visible!important}
+ .table-wrap{overflow-x:auto!important;overflow-y:visible!important}
+ .modal{align-items:flex-start!important;padding:10px!important}
+ .modal-card{width:100%!important;max-height:calc(100dvh - 20px)!important;margin:0 auto!important}
+}
+
 </style>
 </head>
 <body>
