@@ -183,6 +183,28 @@ html,body{overscroll-behavior-y:contain!important;touch-action:pan-y!important}
  .layout>.main{overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y!important;-webkit-overflow-scrolling:touch!important}
 }
 
+
+/* Unified owner dashboard scrolling: normal vertical swipes in every workspace. */
+html,body{height:100%!important;min-height:100%!important;overflow:hidden!important;overscroll-behavior-y:auto!important;touch-action:pan-y!important}
+#app{height:100dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;touch-action:pan-y!important}
+.top{flex:0 0 auto!important}
+.layout{display:grid!important;grid-template-columns:235px minmax(0,1fr)!important;flex:1 1 auto!important;height:calc(100dvh - 76px)!important;min-height:0!important;overflow:hidden!important;touch-action:pan-y!important}
+.layout>aside,.layout>.main{min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+.layout>.main{height:100%!important}
+.layout>aside{height:100%!important}
+.layout>.main .page,#page-overview,#page-menu,#page-orders,#page-tables,#page-staff,#page-settings{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+.table-wrap{max-width:100%!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important}
+.modal{touch-action:pan-y!important}
+.modal-card{max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+@media(max-width:700px){
+ html,body{height:100%!important;overflow:hidden!important}
+ #app{height:100dvh!important;overflow:hidden!important}
+ .layout{display:block!important;height:calc(100dvh - 64px)!important;min-height:0!important;overflow:hidden!important}
+ .layout>aside{display:none!important}
+ .layout>.main{display:block!important;width:100%!important;height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 10px calc(28px + env(safe-area-inset-bottom))!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+ .layout>.main .page{height:auto!important;max-height:none!important;overflow:visible!important}
+}
+
 </style>
 </head>
 <body>
