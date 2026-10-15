@@ -492,6 +492,37 @@ body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overf
  .checkout-page .checkout-layout{min-height:0!important;flex:1 1 0%!important}
 }
 
+
+/* FINAL CART: screenshot-matched fixed frame; only the item list scrolls. */
+.checkout-page{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.checkout-page main{display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:calc(100dvh - 64px)!important;min-height:0!important;overflow:hidden!important;padding:8px 10px!important}
+.checkout-page #customerView{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel,.checkout-page #cartPanel.hidden{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;flex:1 1 auto!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0 auto!important;padding:clamp(12px,1.6vw,24px)!important;overflow:hidden!important}
+.checkout-page .checkout-top{flex:0 0 auto!important;padding-bottom:12px!important}
+.checkout-page .checkout-heading{flex:0 0 auto!important;margin:10px 0 14px!important}
+.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.8fr) minmax(330px,1fr)!important;gap:14px!important;flex:1 1 0%!important;width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important;margin-bottom:8px!important}
+.checkout-page #cartRows{display:block!important;flex:1 1 0%!important;width:100%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+.checkout-page .add-more-btn{display:flex!important;flex:0 0 auto!important;width:100%!important;margin-top:10px!important}
+.checkout-page .checkout-summary{position:relative!important;top:auto!important;align-self:stretch!important;width:100%!important;height:100%!important;max-height:100%!important;min-height:0!important;overflow:visible!important;overscroll-behavior:initial!important}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 62px)!important;padding:5px!important}
+ .checkout-page #cartPanel,.checkout-page #cartPanel.hidden{padding:10px!important;border-radius:16px!important}
+ .checkout-page .checkout-top{padding-bottom:8px!important}
+ .checkout-page .checkout-heading{margin:8px 0!important;gap:6px!important}
+ .checkout-page .checkout-heading h2{font-size:25px!important}
+ .checkout-page .checkout-heading p{font-size:10px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:8px!important;flex:1 1 0%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;height:auto!important;min-height:0!important;padding:9px!important}
+ .checkout-page #cartRows{height:0!important;min-height:0!important}
+ .checkout-page .add-more-btn{margin-top:7px!important;padding:9px!important}
+ .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:10px!important}
+ .checkout-page .checkout-summary .field{margin:7px 0!important}
+ .checkout-page .checkout-summary .payment-detail{padding:8px!important}
+ .checkout-page .checkout-summary img{max-height:90px!important;width:auto!important}
+}
+
 </style>
 </head>
 <body>
