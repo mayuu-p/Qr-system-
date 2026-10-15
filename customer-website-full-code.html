@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#17251f">
+<title>Thyme & Whisk | Order at Your Table</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+html,body{overscroll-behavior:none;overscroll-behavior-y:none;overscroll-behavior-x:none}
+:root{--ink:#17251f;--green:#246b4b;--lime:#d8f078;--cream:#faf8f1;--muted:#777d75;--line:#e8e5da;--white:#fff;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.hidden{display:none!important}
+header{background:var(--ink);color:white;padding:17px 5%;position:sticky;top:0;z-index:20}.top{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:22px;font-weight:900;letter-spacing:-.7px}.brand span{color:var(--lime)}.tag{font-size:12px;color:#d3d8d1;margin-top:5px}.table-pill{background:#ffffff17;border:1px solid #ffffff30;padding:9px 13px;border-radius:30px;font-size:12px;white-space:nowrap}
+main{max-width:1200px;margin:auto;padding:25px 22px 115px}.hero{position:relative;overflow:hidden;background:#e9e8d6;border-radius:24px;padding:32px;min-height:235px;display:flex;align-items:center;margin-bottom:27px}.hero-copy{position:relative;z-index:1;max-width:540px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800;color:var(--green)}.hero h1{font-family:Georgia,serif;font-size:clamp(35px,6vw,58px);line-height:1.03;letter-spacing:-1.7px;margin:13px 0}.hero p{color:#59685c;max-width:380px;line-height:1.6;font-size:14px}.hero img{position:absolute;right:0;top:0;width:43%;height:100%;object-fit:cover;mask-image:linear-gradient(to right,transparent,#000 22%);opacity:.95}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:25px 0 16px}h2{font-family:Georgia,serif;font-size:29px;letter-spacing:-.5px;margin:0}.muted{color:var(--muted);font-size:13px}.categories{display:flex;gap:9px;overflow-x:auto;padding:2px 0 15px;scrollbar-width:none}.categories button{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--ink);border-radius:25px;padding:10px 15px;font-size:13px}.categories button.active{background:var(--ink);color:white;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}.orders-page #customerOrdersList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.orders-page #customerOrdersList>.order{margin:0;animation:none;contain:content}.orders-page #customerOrdersList>.orders-toolbar{grid-column:1/-1}.orders-page .order{box-shadow:0 12px 32px #17251f0c;transition:transform .22s,box-shadow .22s}.orders-page .order:hover{transform:translateY(-3px);box-shadow:0 18px 36px #17251f16}.staff-order-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.staff-order-grid>.order{margin:0;animation:none;contain:content}@media(max-width:650px){.orders-page #customerOrdersList,.staff-order-grid{grid-template-columns:1fr}}.card{background:white;border:1px solid var(--line);border-radius:17px;overflow:hidden;transition:transform .22s,box-shadow .22s;animation:rise .35s ease both}.card:hover{transform:translateY(-4px);box-shadow:0 12px 28px #17251f12}.photo{height:175px;position:relative;background:#ebe8dd;overflow:hidden}.photo img{width:100%;height:100%;object-fit:cover;transition:transform .4s}.card:hover .photo img{transform:scale(1.05)}.photo-label{position:absolute;top:10px;left:10px;background:#fffdf0e8;border-radius:20px;padding:6px 9px;font-size:10px;font-weight:800}.card-body{padding:14px}.card h3{font-size:16px;margin:0 0 7px}.card .desc{color:var(--muted);font-size:12px;line-height:1.5;min-height:33px}.card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:13px}.price{font-size:17px;font-weight:900}.add{width:38px;height:38px;border-radius:12px;background:var(--green);color:white;font-size:24px;border:0}.add:hover{background:var(--ink)}
+.modal-backdrop{position:fixed;inset:0;z-index:100;background:#101b16a8;display:flex;align-items:center;justify-content:center;padding:20px}.modal-card{width:min(420px,100%);background:#fffdf7;border-radius:22px;padding:25px;box-shadow:0 24px 90px #0004;animation:rise .2s ease}.modal-card h2{margin:0 0 10px}.modal-card .order-actions{margin-top:22px}.notice{padding:13px 15px;border-radius:12px;background:#e5f3e8;color:#205b3b;margin-bottom:15px;overflow-wrap:anywhere;font-size:13px}.notice.error{background:#fee8e6;color:var(--red)}.notice.info{background:#e8f1fa;color:#24527b}.bottom-cart{position:fixed;z-index:30;bottom:14px;left:50%;transform:translateX(-50%);width:min(650px,calc(100% - 26px));padding:10px;background:#17251f;color:white;border-radius:17px;box-shadow:0 12px 40px #0003;display:flex;align-items:center;justify-content:space-between;gap:12px}.bottom-cart button{background:var(--lime);color:var(--ink);font-weight:800;border:0;border-radius:11px;padding:13px 17px}.cart-count{font-size:11px;color:#d4dfd5;margin-top:4px}.panel{background:white;border:1px solid var(--line);padding:22px;border-radius:18px;margin-top:20px}.panel h2{margin-bottom:14px}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;padding:13px;border:1px solid #d9ddd4;border-radius:10px;background:white;outline-color:var(--green)}.primary{border:0;background:var(--green);color:white;border-radius:11px;padding:13px 17px;font-weight:800}.secondary{border:1px solid var(--line);background:white;color:var(--ink);border-radius:10px;padding:10px 13px}.cart-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}.qty{display:flex;align-items:center;gap:8px}.qty button{width:30px;height:30px;border:1px solid var(--line);background:white;border-radius:9px}.total-row{display:flex;justify-content:space-between;font-weight:900;font-size:18px;padding:17px 0}.confirm{text-align:center;padding:35px 15px}.order-success-overlay{position:fixed!important;inset:0!important;z-index:10050!important;display:grid!important;place-items:center!important;padding:18px!important;margin:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;overflow:auto!important;background:rgba(13,25,19,.54)!important;backdrop-filter:blur(8px);border:0!important;border-radius:0!important;box-shadow:none!important;animation:successBackdropIn .2s ease-out both}.order-success-overlay .confirm{width:min(560px,100%);margin:auto;background:#fff;border:1px solid #e4ebe1;border-radius:28px;padding:clamp(28px,5vw,52px) 22px;box-shadow:0 30px 100px rgba(0,0,0,.22);animation:successCardIn .25s cubic-bezier(.2,.8,.2,1) both}.order-success-overlay .primary{margin-top:10px}@keyframes successBackdropIn{from{opacity:0}to{opacity:1}}@keyframes successCardIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.confirm-icon{margin:auto;width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:#e0f2df;color:var(--green);font-size:35px}.order-code{font-size:35px;font-weight:900;letter-spacing:3px;margin:14px 0}.order{border:1px solid var(--line);border-radius:13px;padding:15px;margin:12px 0;background:white}.order select{padding:9px;border:1px solid var(--line);border-radius:8px}.order-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.order-item-photo{width:54px;height:54px;flex:0 0 54px;border-radius:10px;overflow:hidden;background:#ebe8dd}.order-item-photo img{width:100%;height:100%;object-fit:cover}.order-item-info{flex:1;min-width:0}.order-item-info strong{display:block;overflow-wrap:anywhere}.order-item-price{white-space:nowrap;font-weight:800}.order-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.served-btn{border:0;background:#246b4b;color:white;border-radius:10px;padding:11px 14px;font-weight:800}.accept-btn{border:0;background:var(--lime);color:var(--ink);border-radius:12px;padding:11px 15px;font-weight:900;box-shadow:0 5px 0 #a5c14b}.liquid-btn{position:relative;overflow:hidden;border:1px solid #c9e66b;background:linear-gradient(120deg,#d8f078,#b7e8a0,#d8f078);background-size:200% 200%;color:#17251f;border-radius:999px;padding:12px 17px;font-weight:900;box-shadow:0 7px 20px #246b4b25;animation:liquidShift 4s ease infinite,softPulse 2s ease-in-out infinite}.liquid-btn:before{content:"";position:absolute;inset:-50%;background:linear-gradient(110deg,transparent 35%,#ffffffb8 48%,transparent 60%);transform:translateX(-100%) rotate(8deg);animation:liquidShine 3s ease-in-out infinite}.liquid-btn span{position:relative;z-index:1}.orders-page .hero,.orders-page #categories,.orders-page #menu,.orders-page #cartPanel,.orders-page #confirmation,.orders-page .section-head:has(#menuCount){display:none!important}.orders-page{background:#f6f7f8}.orders-page main{max-width:1060px;padding-top:18px;padding-bottom:32px}.orders-page .top{max-width:1120px;margin:auto}.orders-page #customerOrdersPanel{margin:12px auto 24px;min-height:70vh;border:1px solid #eceef0;border-radius:26px;background:#fff;padding:clamp(18px,3vw,34px);box-shadow:0 12px 40px rgba(25,35,28,.055);animation:ordersEnter .3s ease both}.orders-page #customerOrdersList{overflow-anchor:none}.orders-page .orders-toolbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);padding:0 0 17px;margin-bottom:20px;border-bottom:1px solid #eef0ec}.orders-page .orders-toolbar .eyebrow{color:#16804a;font-size:11px;letter-spacing:1.6px;font-weight:900}.orders-page .orders-toolbar .muted{font-size:13px}.orders-page #customerOrdersList>.order{background:#fff;border:1px solid #e8ece7;border-radius:22px!important;padding:clamp(17px,3vw,26px)!important;margin:0 0 16px;box-shadow:0 6px 22px rgba(20,40,25,.035);animation:none!important;transition:border-color .18s,box-shadow .18s}.orders-page #customerOrdersList>.order:hover{border-color:#c9dfce;box-shadow:0 10px 28px rgba(20,80,40,.07)}.orders-page #customerOrdersList>.order .section-head{align-items:flex-start;gap:12px}.orders-page #customerOrdersList>.order .eyebrow{font-size:10px;letter-spacing:1.5px;color:#16804a;font-weight:900}.orders-page #customerOrdersList>.order h2{font-size:clamp(19px,2.5vw,25px)!important;letter-spacing:-.5px}.orders-page .order-status-chip{border-radius:8px;padding:7px 10px;font-size:11px;letter-spacing:.2px}.orders-page .order-items-grid{display:grid;grid-template-columns:1fr;gap:0;margin-top:16px;border-top:1px solid #f0f1ee}.orders-page .order-items-grid .order-item{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid #f0f1ee;align-items:center}.orders-page .order-items-grid .order-item:last-child{border-bottom:0}.orders-page .order-items-grid .order-item-photo{width:64px;height:64px;flex:0 0 64px;border-radius:13px;background:#f1f3ee}.orders-page .order-items-grid .order-item-info{flex:1;min-width:0}.orders-page .order-items-grid .order-item-info strong{font-size:14px;line-height:1.4}.orders-page .order-items-grid .order-item-price{font-size:13px;font-weight:800;color:#26332b}.orders-page .timer-chip{border-radius:9px;padding:9px 11px;font-size:12px}.orders-page .liquid-btn{border-radius:12px;min-height:42px;padding:10px 15px}.orders-page #customerOrdersList>.order .total-row{font-size:19px;padding:16px 0}.orders-page #customerOrdersList>.order [data-order-total]{font-size:20px!important;white-space:nowrap}.orders-page #customerOrdersList>.order .edit-order-actions{padding-top:8px;border-top:1px solid #f0f1ee}.orders-page #customerOrdersList>.order button:disabled{opacity:.58;filter:grayscale(.2)}.timer-chip{display:inline-block;border-radius:999px;background:#e8f5dc;color:#246b4b;padding:7px 10px;font-size:12px;font-weight:900}.timer-chip.expired{background:#fff0df;color:#97520b}.order-status-chip{display:inline-flex;align-items:center;border-radius:999px;padding:7px 10px;background:#e8f1fa;color:#24527b;font-size:12px;font-weight:900;text-transform:capitalize}.status-new{background:#fff0df;color:#97520b}.status-accepted{background:#e5f3e8;color:#205b3b}.status-preparing{background:#e8f1fa;color:#24527b}.status-ready{background:#e8f5dc;color:#246b4b}.status-served{background:#e7e7e7;color:#333}@keyframes liquidShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}@keyframes liquidShine{0%,60%{transform:translateX(-100%) rotate(8deg)}90%,100%{transform:translateX(100%) rotate(8deg)}}@keyframes softPulse{0%,100%{box-shadow:0 7px 20px #246b4b25}50%{box-shadow:0 7px 27px #246b4b45}}@keyframes ordersEnter{from{opacity:0;transform:translateY(20px) scale(.99);filter:blur(4px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@media(max-width:420px){.order-item-photo{width:46px;height:46px;flex-basis:46px}.order-item-price{font-size:12px}}footer{text-align:center;padding:30px 12px;color:var(--muted);font-size:12px}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.photo{height:155px}}@media(max-width:650px){header{padding:14px 16px}.brand{font-size:20px}main{padding:16px 13px 110px}.hero{min-height:215px;padding:23px 19px;border-radius:19px}.hero h1{font-size:39px;max-width:280px}.hero img{width:58%;opacity:.38;mask-image:linear-gradient(to right,transparent,#000 35%)}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo{height:135px}.card-body{padding:11px}.card h3{font-size:14px}.card .desc{font-size:11px}.price{font-size:15px}.add{width:34px;height:34px}h2{font-size:25px}.panel{padding:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}} .order,.card,.panel{transform:translateZ(0);backface-visibility:hidden}.order-item-photo img{display:block;aspect-ratio:1/1}.secondary,.primary,.accept-btn,.served-btn,.add,.categories button{transition:transform .16s ease,background-color .16s ease,box-shadow .16s ease}.secondary:active,.primary:active,.accept-btn:active,.served-btn:active,.add:active,.categories button:active{transform:scale(.97)}.order{content-visibility:auto;contain-intrinsic-size:280px}.orders-page #customerOrdersList>.order{animation:none!important}.staff-order-grid>.order{animation:none!important}.orders-page main{max-width:1600px}.orders-page #customerOrdersPanel{padding:clamp(18px,3vw,34px)}
+.checkout-page .hero,.checkout-page .section-head:has(#menuCount),.checkout-page #categories,.checkout-page #menu,.checkout-page #customerOrdersPanel,.checkout-page footer{display:none!important}.checkout-page main{max-width:1180px;padding-top:14px;padding-bottom:14px;height:calc(100dvh - 78px);overflow:hidden}.checkout-page .checkout-panel{display:block!important;margin:0 auto;border:1px solid #e7ebe5;border-radius:28px;padding:clamp(16px,3vw,30px);background:linear-gradient(145deg,#fff 0%,#fbfcf8 100%);box-shadow:0 24px 70px #14231d12;height:100%;min-height:0;overflow:hidden}.checkout-page{height:100dvh;overflow:hidden}.checkout-page .checkout-heading{margin:16px 0}.checkout-page .checkout-layout{height:calc(100% - 118px);min-height:0}.checkout-page .checkout-items-wrap{display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%}.checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto}.checkout-page #cartRows{display:block;flex:1 1 auto;min-height:0;height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:5px;scrollbar-gutter:stable}.checkout-page .checkout-summary{align-self:start;max-height:100%;overflow:visible}.checkout-page .checkout-panel #targetOrderPicker{flex:0 0 auto}.checkout-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:22px;border-bottom:1px solid #e8ece6}.back-to-menu{border:1px solid #dce4db;background:#fff;color:#1f6749;border-radius:12px;padding:11px 15px;font-weight:800}.checkout-step{font-size:10px;letter-spacing:1.8px;color:#718075;font-weight:900}.checkout-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:28px 0}.checkout-heading h2{font-size:clamp(32px,4vw,43px);margin:7px 0}.checkout-heading p{margin:0;line-height:1.5}.checkout-table-pill{flex-shrink:0;border-radius:999px;background:#eaf4e6;color:#216343;padding:12px 16px;font-weight:900;font-size:12px}.checkout-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.8fr);gap:28px;align-items:start}.checkout-items-wrap,.checkout-summary{border:1px solid #e7ebe5;background:#fff;border-radius:20px;padding:22px;min-width:0}.checkout-summary{background:#f8faf6;position:sticky;top:110px}.checkout-section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;font-weight:900;margin-bottom:16px}.checkout-section-title span{font-size:12px;color:#6c7c70;font-weight:700}.checkout-page .cart-row{padding:17px 0;border-bottom:1px solid #edf0eb;gap:14px}.checkout-page .cart-row>div:first-child strong{font-size:14px}.checkout-page .qty{background:#f3f7ef;border:1px solid #dce8d7;border-radius:12px;padding:4px;gap:10px}.checkout-page .qty button{border:0;background:#fff;color:#216343;font-weight:900;width:32px;height:32px;border-radius:9px;box-shadow:0 2px 7px #14231d0b}.add-more-btn{margin-top:18px;border:1px dashed #a8c5a6;background:#f8fcf5;color:#216343;border-radius:12px;padding:12px 15px;font-weight:800;width:100%}.checkout-page .summary-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;color:#657168;font-size:13px}.checkout-page .summary-line strong{color:#17251f;font-size:14px}.checkout-page .included{color:#216343;font-weight:800;font-size:12px}.checkout-page .summary-divider{height:1px;background:#e0e7dd;margin:7px 0}.checkout-page .total-row{padding:18px 0 22px;font-size:18px}.checkout-page .field{margin:14px 0}.checkout-page .field label{font-size:10px;letter-spacing:1px;color:#68766e}.checkout-page .field input{padding:14px;border-color:#dce4db;border-radius:12px;background:white}.checkout-submit{min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-radius:14px;font-size:15px;box-shadow:0 8px 20px #1f674926}.checkout-submit span{font-size:22px}.checkout-trust{display:flex;align-items:flex-start;gap:8px;margin-top:14px;color:#718075;font-size:11px;line-height:1.5}.checkout-trust span{color:#216343;font-weight:900}.checkout-page #bottomCart{display:none!important}@media(max-width:760px){.orders-page main{padding:10px 10px 24px}.orders-page #customerOrdersPanel{margin:8px auto 18px;padding:14px;border-radius:19px;min-height:calc(100dvh - 110px)}.orders-page .orders-toolbar{padding-bottom:12px;margin-bottom:14px}.orders-page #customerOrdersList>.order{padding:15px!important;border-radius:17px!important;margin-bottom:12px}.orders-page #customerOrdersList>.order .section-head{align-items:flex-start}.orders-page #customerOrdersList>.order h2{font-size:19px!important}.orders-page #customerOrdersList>.order [data-order-total]{font-size:17px!important}.orders-page .order-items-grid .order-item-photo{width:54px;height:54px;flex-basis:54px}.orders-page .order-items-grid .order-item-info strong{font-size:13px}.orders-page .order-items-grid .order-item-price{font-size:12px}.orders-page .timer-chip{font-size:11px;padding:8px}.checkout-page main{padding:8px 8px 10px;height:calc(100dvh - 70px)}.checkout-page .checkout-panel{padding:13px 11px;border-radius:18px;height:100%;min-height:0}.checkout-top{padding-bottom:10px}.checkout-step{font-size:8px;letter-spacing:1px}.checkout-heading{margin:12px 0;align-items:flex-start}.checkout-heading h2{font-size:27px}.checkout-heading p{font-size:11px}.checkout-table-pill{padding:8px 10px;font-size:9px}.checkout-layout{display:flex;flex-direction:column;gap:8px;height:calc(100% - 100px);min-height:0}.checkout-items-wrap{flex:1;min-height:0;padding:11px;border-radius:14px}.checkout-page #cartRows{min-height:0;overflow-y:auto}.checkout-summary{flex:0 0 auto;position:static;max-height:none;overflow:visible;padding:11px 13px;border-radius:14px}.checkout-section-title{font-size:12px;margin-bottom:7px}.checkout-page .summary-line{padding:5px 0;font-size:11px}.checkout-page .total-row{padding:8px 0;font-size:15px}.checkout-page .field{margin:7px 0}.checkout-page .field label{font-size:9px}.checkout-page .field input{padding:9px}.checkout-submit{min-height:42px;padding:10px 13px;font-size:13px}.checkout-trust{font-size:9px;margin-top:6px}.add-more-btn{padding:8px;margin-top:8px}.checkout-page .cart-row{align-items:center;padding:10px 0}.checkout-page .cart-row .muted{font-size:10px}}@media(min-width:761px){.checkout-page .checkout-panel{animation:ordersEnter .35s ease both}}.orders-page #customerOrdersList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}.orders-page #customerOrdersList>.order{min-width:0;padding:24px!important}.staff-order-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}.staff-order-grid>.order{padding:24px;min-width:0}@media(max-width:650px){.orders-page #customerOrdersList,.staff-order-grid{grid-template-columns:1fr}.orders-page #customerOrdersPanel{padding:15px}.orders-page #customerOrdersList>.order,.staff-order-grid>.order{padding:16px!important}}
+/* Responsive premium service layout */
+:root{--ink:#14231d;--green:#1f6749;--lime:#d9ef9a;--cream:#f7f8f4;--line:#e2e8e1;--muted:#68766e}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth}
+body{min-width:320px;width:100%;overflow-x:hidden;background:radial-gradient(ellipse at top,#fff 0%,#f7f8f4 58%,#f0f4ef 100%)}
+*,*::before,*::after{-webkit-tap-highlight-color:transparent}
+body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
+img{-webkit-user-drag:none;user-drag:none}
+header{box-shadow:0 8px 28px #10231a20;border-bottom:1px solid #ffffff18;backdrop-filter:blur(18px)}
+main{width:100%;max-width:1720px;padding-left:clamp(12px,2.2vw,34px);padding-right:clamp(12px,2.2vw,34px)}
+.panel{border-color:#e4e9e1;box-shadow:0 14px 38px #15251c08}
+.card,.order{border-color:#e5e9e2;box-shadow:0 10px 28px #15251c0a}
+.primary,.served-btn,.accept-btn,.secondary,.liquid-btn{min-height:42px;touch-action:manipulation}
+.order-actions{gap:9px}
+.orders-page main{max-width:1760px;padding-top:clamp(12px,2vw,28px)}
+.orders-page #customerOrdersPanel{min-height:calc(100dvh - 120px);margin-top:8px;background:linear-gradient(145deg,#fff,#fbfcf9);border:1px solid #e3e9e1;box-shadow:0 20px 60px #15251c0b}
+.orders-page #customerOrdersList{grid-template-columns:repeat(auto-fit,minmax(min(100%,390px),1fr));gap:clamp(12px,1.5vw,22px)}
+.orders-page #customerOrdersList>.order{padding:clamp(14px,1.6vw,24px)!important}
+.staff-order-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,355px),1fr));gap:clamp(12px,1.5vw,22px)}
+.staff-order-grid>.order{padding:clamp(14px,1.5vw,23px);border-radius:18px;background:linear-gradient(150deg,#fff,#fdfefc)}
+.staff-order-grid .section-head{align-items:center}
+.staff-order-grid .order-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.staff-order-grid .order-actions button{width:100%;min-width:0;padding:11px 9px;white-space:normal}
+.served-btn:disabled{background:#d8ded9!important;color:#6c766f!important;box-shadow:none!important;opacity:1!important}
+.order-item-info strong{overflow-wrap:anywhere;line-height:1.35}
+.order-item-price,.timer-chip{font-variant-numeric:tabular-nums}
+.bottom-cart{padding-bottom:max(10px,env(safe-area-inset-bottom));backdrop-filter:blur(16px)}
+@media(min-width:1100px){.staff-order-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.orders-page #customerOrdersList{grid-template-columns:repeat(auto-fit,minmax(430px,1fr))}}
+@media(min-width:651px) and (max-width:1099px){.staff-order-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.orders-page #customerOrdersList{grid-template-columns:repeat(2,minmax(0,1fr))}.staff-order-grid>.order{padding:16px}}
+@media(max-width:650px){main{padding-left:12px;padding-right:12px}.orders-page #customerOrdersList,.staff-order-grid{grid-template-columns:minmax(0,1fr)}.orders-page #customerOrdersPanel{min-height:calc(100dvh - 105px);padding:14px}.orders-page #customerOrdersList>.order,.staff-order-grid>.order{padding:15px!important}.staff-order-grid .order-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.section-head{align-items:flex-start}.table-pill{padding:8px 10px}}
+@media(hover:none){.card:hover,.order:hover,.photo img{transform:none}.primary:active,.secondary:active,.accept-btn:active,.served-btn:active,.add:active{transform:scale(.985)}}
+
+/* Horizontal order boards: full-width customer orders, compact staff cards, side-by-side food items */
+.orders-page #customerOrdersList{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;width:100%;align-items:stretch}
+.orders-page #customerOrdersList>.order{width:100%;max-width:none;min-width:0;padding:clamp(14px,2vw,26px)!important}
+.orders-page #customerOrdersList>.orders-toolbar{grid-column:1/-1;width:100%}
+.orders-page #customerOrdersList>.order .order-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0}
+.orders-page #customerOrdersList>.order .order-item .qty{grid-column:2/-1;justify-self:start}
+.staff-order-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;align-items:stretch;width:100%}
+.staff-order-grid>.order{min-width:0;width:100%;padding:clamp(12px,1.2vw,19px)!important}
+.staff-order-grid .order-item{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:8px;align-items:center;min-width:0;padding:8px 0}
+.staff-order-grid .order-item-photo{width:42px;height:42px;flex-basis:42px}
+.staff-order-grid .order-item-info{min-width:0}
+.staff-order-grid .order-item-info strong{font-size:13px;line-height:1.25}
+.staff-order-grid .order-item-price{font-size:12px}
+.staff-order-grid .order-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+.staff-order-grid .order-actions button{min-width:0;padding:10px 7px;font-size:12px;overflow-wrap:anywhere}
+@media(min-width:1200px){.staff-order-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.staff-order-grid .order-items,.staff-order-grid .items-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}}
+@media(min-width:651px) and (max-width:1199px){.staff-order-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.staff-order-grid .order-item{grid-template-columns:38px minmax(0,1fr) auto;gap:7px}.staff-order-grid .order-item-photo{width:38px;height:38px}}
+@media(max-width:650px){.orders-page #customerOrdersList{grid-template-columns:minmax(0,1fr)!important}.staff-order-grid{grid-template-columns:minmax(0,1fr)!important}.staff-order-grid .order-item{grid-template-columns:42px minmax(0,1fr) auto}.orders-page #customerOrdersList>.order{padding:14px!important}}
+
+.order-items-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 14px;align-items:start;width:100%;margin:10px 0}.order-items-grid>.order-item{min-width:0;border:1px solid #e7ece5;border-radius:12px;background:#fff;padding:8px;grid-template-columns:42px minmax(0,1fr);gap:7px;align-content:start}.order-items-grid .order-item-photo{width:42px;height:42px;flex-basis:42px}.order-items-grid .order-item-info strong{font-size:12px;line-height:1.25}.order-items-grid .order-item-info .muted{font-size:11px}.order-items-grid .order-item-price{grid-column:2;justify-self:start;font-size:12px}.order-items-grid .qty{grid-column:1/-1;justify-self:start}.staff-order-grid .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.staff-order-grid .order-items-grid>.order-item{grid-template-columns:34px minmax(0,1fr);padding:7px;gap:6px}.staff-order-grid .order-items-grid .order-item-photo{width:34px;height:34px;flex-basis:34px}.staff-order-grid .order-items-grid .order-item-info strong{font-size:11px}.staff-order-grid .order-items-grid .order-item-info .muted{font-size:10px}.staff-order-grid .order-items-grid .order-item-price{font-size:11px}@media(min-width:651px) and (max-width:1050px){.orders-page #customerOrdersList .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.orders-page #customerOrdersList .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.staff-order-grid .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.order-items-grid>.order-item{padding:7px}}
+/* Match staff order cards to the wide customer Orders page */
+.staff-order-grid{grid-template-columns:minmax(0,1fr)!important;width:100%;gap:18px!important}
+.staff-order-grid>.order{width:100%;max-width:none;min-width:0;padding:clamp(18px,2.2vw,30px)!important}
+.staff-order-grid .order-items-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px 14px!important}
+.staff-order-grid .order-items-grid>.order-item{grid-template-columns:42px minmax(0,1fr) auto;padding:10px;gap:9px}
+.staff-order-grid .order-items-grid .order-item-photo{width:42px;height:42px;flex-basis:42px}
+.staff-order-grid .order-items-grid .order-item-info strong{font-size:13px}
+.staff-order-grid .order-items-grid .order-item-info .muted{font-size:11px}
+.staff-order-grid .order-items-grid .order-item-price{grid-column:auto;justify-self:end;font-size:12px}
+.staff-order-grid .order-actions{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media(min-width:651px) and (max-width:1050px){.staff-order-grid .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:650px){
+ .staff-order-grid{grid-template-columns:minmax(0,1fr)!important}
+ .staff-order-grid>.order{padding:15px!important}
+ .staff-order-grid .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+ .staff-order-grid .order-items-grid>.order-item{grid-template-columns:36px minmax(0,1fr);padding:7px;gap:6px}
+ .staff-order-grid .order-items-grid .order-item-photo{width:36px;height:36px;flex-basis:36px}
+ .staff-order-grid .order-items-grid .order-item-info strong{font-size:11px}
+ .staff-order-grid .order-items-grid .order-item-price{grid-column:2;justify-self:start;font-size:11px}
+ .staff-order-grid .order-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
+/* Customer order cards: improve readability and food photo sizing */
+.orders-page #customerOrdersList>.order{padding:clamp(20px,2.5vw,34px)!important;border-radius:20px}
+.orders-page #customerOrdersList>.order .section-head h2{font-size:clamp(24px,2vw,30px)!important;line-height:1.15}
+.orders-page #customerOrdersList>.order .eyebrow{font-size:12px;letter-spacing:1.7px}
+.orders-page #customerOrdersList>.order .order-items-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px!important;margin:16px 0}
+.orders-page #customerOrdersList>.order .order-items-grid>.order-item{grid-template-columns:58px minmax(0,1fr);gap:10px;padding:11px;border-radius:14px;min-height:82px}
+.orders-page #customerOrdersList>.order .order-items-grid .order-item-photo{width:58px;height:58px;flex-basis:58px;border-radius:12px}
+.orders-page #customerOrdersList>.order .order-items-grid .order-item-info strong{font-size:14px;line-height:1.35}
+.orders-page #customerOrdersList>.order .order-items-grid .order-item-info .muted{display:block;font-size:12px;line-height:1.4;margin-top:4px}
+.orders-page #customerOrdersList>.order .order-items-grid .order-item-price{grid-column:2;justify-self:start;font-size:14px;line-height:1.3;margin-top:2px}
+.orders-page #customerOrdersList>.order .total-row{font-size:clamp(19px,1.6vw,23px);padding:20px 0}
+.orders-page #customerOrdersList>.order .order-status-chip,.orders-page #customerOrdersList>.order .timer-chip{font-size:13px;padding:8px 12px}
+.orders-page #customerOrdersList>.order .liquid-btn{padding:13px 18px;font-size:14px}
+@media(min-width:651px) and (max-width:1050px){
+ .orders-page #customerOrdersList>.order .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .orders-page #customerOrdersList>.order .order-items-grid>.order-item{grid-template-columns:52px minmax(0,1fr);padding:10px}
+ .orders-page #customerOrdersList>.order .order-items-grid .order-item-photo{width:52px;height:52px;flex-basis:52px}
+}
+@media(max-width:650px){
+ .orders-page #customerOrdersList>.order{padding:17px!important}
+ .orders-page #customerOrdersList>.order .order-items-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+ .orders-page #customerOrdersList>.order .order-items-grid>.order-item{grid-template-columns:42px minmax(0,1fr);gap:7px;padding:8px;min-height:70px}
+ .orders-page #customerOrdersList>.order .order-items-grid .order-item-photo{width:42px;height:42px;flex-basis:42px}
+ .orders-page #customerOrdersList>.order .order-items-grid .order-item-info strong{font-size:12px}
+ .orders-page #customerOrdersList>.order .order-items-grid .order-item-info .muted{font-size:11px}
+ .orders-page #customerOrdersList>.order .order-items-grid .order-item-price{font-size:12px}
+ .orders-page #customerOrdersList>.order .total-row{font-size:19px;padding:16px 0}
+}
+
+/* Compact one-second toast notifications */
+#toastStack{position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;max-width:calc(100vw - 28px)}
+.app-toast{pointer-events:auto;display:flex;align-items:center;gap:9px;max-width:min(340px,calc(100vw - 28px));padding:10px 13px;border-radius:12px;background:#fff;color:#172033;border:1px solid #dce5ed;border-left:4px solid #0284c7;box-shadow:0 8px 28px rgba(15,23,42,.2);font-size:13px;font-weight:650;line-height:1.35;animation:toastIn .16s ease-out}
+.app-toast.error{border-left-color:#dc2626}.app-toast.success{border-left-color:#16a34a}.app-toast.out{opacity:0;transform:translateY(8px);transition:opacity .16s,transform .16s}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){#toastStack{right:10px;bottom:10px}.app-toast{font-size:12px;padding:9px 11px}}
+#notice:not(.hidden){position:fixed!important;right:14px!important;bottom:14px!important;top:auto!important;left:auto!important;z-index:9998!important;width:max-content;max-width:min(340px,calc(100vw - 28px));margin:0!important;box-shadow:0 8px 28px rgba(15,23,42,.2)}
+@media(max-width:480px){#notice:not(.hidden){right:10px!important;bottom:10px!important;max-width:calc(100vw - 20px)}}
+ .unavailable-pill{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border-radius:999px;background:#fff0ef;color:#b42318;border:1px solid #fecaca;font-size:11px;font-weight:800;white-space:nowrap}.card:has(.unavailable-pill) .photo:after{content:"UNAVAILABLE";position:absolute;top:12px;right:10px;background:#b42318;color:white;padding:5px 8px;border-radius:7px;font-size:9px;font-weight:900;letter-spacing:.06em}.card .photo{position:relative}html,body{overscroll-behavior:none;touch-action:pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+/* Stable app-like checkout: only the item list scrolls. */
+.checkout-page main{height:calc(100dvh - 70px);min-height:0;overflow:hidden;padding:10px 12px}
+.checkout-page .checkout-panel{display:flex!important;flex-direction:column;height:100%;min-height:0;overflow:hidden;padding:clamp(14px,2vw,26px)}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto}
+.checkout-page .checkout-heading{margin:14px 0}
+.checkout-page .checkout-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);flex:1 1 auto;height:auto!important;min-height:0;overflow:hidden;gap:18px;align-items:stretch}
+.checkout-page .checkout-items-wrap{display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:18px}
+.checkout-page .checkout-items-wrap>.checkout-section-title,.checkout-page .add-more-btn{flex:0 0 auto}
+.checkout-page #cartRows{display:block;flex:1 1 0%;height:0;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;padding:0 12px 0 0;overflow-anchor:none}
+.checkout-page .checkout-summary{position:static;align-self:stretch;min-width:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px}
+.checkout-page .cart-row{min-height:68px;padding:14px 0}
+.checkout-page #cartRows::-webkit-scrollbar{width:8px}
+.checkout-page #cartRows::-webkit-scrollbar-thumb{background:#c8d8c8;border-radius:20px;border:2px solid #fff}
+.orders-page #customerOrdersList,.staff-order-grid{overflow-anchor:none}
+.orders-page #customerOrdersList>.order,.staff-order-grid>.order{animation:none!important;overflow-anchor:none}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 64px);padding:7px 7px 9px}
+ .checkout-page .checkout-panel{padding:12px 10px;border-radius:18px}
+ .checkout-page .checkout-top{padding-bottom:9px}
+ .checkout-page .checkout-heading{margin:10px 0;gap:8px}
+ .checkout-page .checkout-heading h2{font-size:26px}
+ .checkout-page .checkout-heading p{font-size:11px}
+ .checkout-page .checkout-step{font-size:8px;letter-spacing:.8px}
+ .checkout-page .checkout-layout{display:flex;flex-direction:column;gap:9px}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%;height:auto;min-height:95px;padding:11px}
+ .checkout-page #cartRows{flex:1 1 0%;height:0;min-height:0;padding-right:12px;touch-action:pan-y}
+ .checkout-page .checkout-summary{flex:0 0 auto;max-height:43%;overflow-y:auto;padding:9px 12px}
+ .checkout-page .checkout-section-title{font-size:12px;margin-bottom:6px}
+ .checkout-page .summary-line{padding:4px 0;font-size:11px}
+ .checkout-page .total-row{padding:7px 0;font-size:15px}
+ .checkout-page .field{margin:5px 0}
+ .checkout-page .field label{font-size:9px}
+ .checkout-page .field input{padding:8px}
+ .checkout-page .checkout-submit{min-height:38px;padding:8px 11px;font-size:12px}
+ .checkout-page .checkout-trust{font-size:9px;margin-top:4px}
+ .checkout-page .add-more-btn{padding:7px;margin-top:7px}
+ .checkout-page .cart-row{min-height:60px;padding:10px 0}
+}
+
+/* Final checkout sizing: fit the viewport and reserve the only scroll for cart rows. */
+.checkout-page{height:100dvh;overflow:hidden;overscroll-behavior:none}
+.checkout-page main{height:calc(100dvh - 164px);min-height:0;overflow:hidden;padding:8px 12px}
+.checkout-page .checkout-panel{display:flex!important;flex-direction:column;height:100%;min-height:0;overflow:hidden;padding:clamp(12px,1.7vw,22px)}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto}
+.checkout-page .checkout-top{padding-bottom:10px}
+.checkout-page .checkout-heading{margin:10px 0}
+.checkout-page .checkout-heading h2{font-size:clamp(26px,3vw,36px)}
+.checkout-page .checkout-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(320px,.82fr);flex:1 1 auto;height:auto!important;min-height:0;overflow:hidden;gap:18px;align-items:stretch}
+.checkout-page .checkout-items-wrap{display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:20px}
+.checkout-page .checkout-items-wrap>.checkout-section-title,.checkout-page .add-more-btn{flex:0 0 auto}
+.checkout-page #cartRows{display:block;flex:1 1 0%;height:0;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;padding:0 12px 0 0;overflow-anchor:none}
+.checkout-page #cartRows .cart-row{min-height:68px;padding:14px 0}
+.checkout-page .checkout-summary{position:static;align-self:stretch;min-width:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px}
+.checkout-page #cartRows::-webkit-scrollbar{width:8px}.checkout-page #cartRows::-webkit-scrollbar-thumb{background:#c8d8c8;border-radius:20px;border:2px solid #fff}
+.checkout-payment{border:1px solid #e4e9df;border-radius:14px;padding:12px;margin:10px 0;background:#fff}.payment-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.payment-choice{display:flex;align-items:center;gap:7px;min-width:0;border:1px solid #e0e7de;border-radius:11px;padding:10px 8px;font-size:12px;font-weight:800;background:#fff;cursor:pointer}.payment-choice.active{border-color:#21704e;background:#eff8ef;box-shadow:0 0 0 1px #21704e inset}.payment-choice input{accent-color:#21704e}.payment-detail{margin-top:10px;padding:10px;border-radius:11px;background:#f5f8f2;font-size:12px}.payment-detail img{display:block;width:min(190px,100%);height:auto;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:10px;padding:8px;margin:8px auto}.payment-detail .upi-launch{display:block;width:100%;margin-top:9px;padding:11px;border:0;border-radius:10px;background:#176947;color:white;font-weight:900}.payment-detail small{color:#667368;line-height:1.45;display:block}.payment-detail .pay-amount{font-size:20px;font-weight:900;margin:5px 0}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 142px);padding:6px 7px 8px}
+ .checkout-page .checkout-panel{padding:10px 9px;border-radius:16px}
+ .checkout-page .checkout-top{padding-bottom:7px}
+ .checkout-page .checkout-heading{margin:8px 0;gap:7px}
+ .checkout-page .checkout-heading h2{font-size:24px}
+ .checkout-page .checkout-heading p{font-size:10px}
+ .checkout-page .checkout-step{font-size:7px;letter-spacing:.7px}
+ .checkout-page .checkout-layout{display:flex;flex-direction:column;gap:8px}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%;height:auto;min-height:100px;padding:10px}
+ .checkout-page #cartRows{flex:1 1 0%;height:0;min-height:0;padding-right:12px;touch-action:pan-y}
+ .checkout-page #cartRows .cart-row{min-height:62px;padding:11px 0}
+ .checkout-page .checkout-summary{flex:0 0 auto;max-height:51%;overflow-y:auto;padding:8px 10px}
+ .checkout-page .checkout-section-title{font-size:11px;margin-bottom:5px}
+ .checkout-page .summary-line{padding:3px 0;font-size:10px}
+ .checkout-page .total-row{padding:6px 0;font-size:14px}
+ .checkout-page .field{margin:4px 0}
+ .checkout-page .field label{font-size:8px}
+ .checkout-page .field input{padding:7px}
+ .checkout-page .checkout-submit{min-height:36px;padding:7px 10px;font-size:12px}
+ .checkout-page .checkout-trust{font-size:8px;margin-top:3px}
+ .checkout-page .add-more-btn{padding:7px;margin-top:6px}
+ .checkout-payment{padding:8px;margin:6px 0}
+ .checkout-payment .checkout-section-title{font-size:10px}
+ .payment-choice-grid{gap:5px}
+ .payment-choice{font-size:10px;padding:7px 5px;gap:4px}
+ .payment-detail{padding:7px;margin-top:6px}
+ .payment-detail img{width:min(145px,100%);padding:5px;margin:5px auto}
+ .payment-detail .pay-amount{font-size:17px}
+}
+
+.payment-order-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;background:#f7faf5;padding:9px 12px;margin:10px 0 14px;font-size:12px}.payment-order-chip span{color:var(--muted)}
+
+/* Responsive app-shell and nested-scroll refinements */
+html{min-height:100%;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;overscroll-behavior-y:contain}
+button,input,select,textarea{font:inherit}
+#staffView:not(.hidden),#staffView #dashboard:not(.hidden),#staffView #tablesPage:not(.hidden){min-width:0;width:100%}
+#staffView{padding:clamp(10px,2vw,26px);max-width:1680px;margin:0 auto}
+#staffView #dashboard{display:block;min-width:0}
+#staffView #orders{min-width:0;width:100%;overflow:visible}
+#staffView .staff-order-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))!important;align-items:stretch;gap:clamp(10px,1.4vw,20px)!important}
+#staffView .order{min-width:0;overflow-wrap:anywhere}
+#staffView .order-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#staffView .order-actions button{min-width:0;white-space:normal}
+.checkout-page{height:100dvh;overflow:hidden}
+.checkout-page header{position:relative;z-index:5}
+.checkout-page main{height:calc(100dvh - 82px);max-width:none;width:100%;min-height:0;overflow:hidden;padding:8px clamp(8px,1.6vw,24px)}
+.checkout-page .checkout-panel{width:100%;max-width:1600px;margin:0 auto;display:flex!important;flex-direction:column;min-height:0;height:100%;overflow:hidden;padding:clamp(10px,1.6vw,24px);border-radius:clamp(12px,1.6vw,24px)}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto}
+.checkout-page .checkout-top{padding-bottom:clamp(7px,1vw,14px)}
+.checkout-page .checkout-heading{margin:clamp(7px,1vw,14px) 0}
+.checkout-page .checkout-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.8fr);gap:clamp(10px,1.4vw,20px);height:auto;flex:1 1 auto;min-height:0;overflow:hidden;align-items:stretch}
+.checkout-page .checkout-items-wrap{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;overflow:hidden;padding:clamp(10px,1.5vw,22px)}
+.checkout-page #cartRows{flex:1 1 0%;height:0;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;scroll-behavior:smooth;padding:0 10px 0 0}
+.checkout-page .checkout-summary{position:static;align-self:stretch;min-width:0;min-height:0;max-height:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;padding:clamp(10px,1.5vw,22px)}
+.checkout-page .checkout-payment{flex:0 0 auto}
+.checkout-page .checkout-submit{width:100%;gap:10px}
+.checkout-page .payment-choice{min-height:44px}
+@media(min-width:761px){
+ .checkout-page .checkout-summary{position:static}
+ .checkout-page .checkout-items-wrap{min-height:0}
+}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 70px);padding:5px 6px 7px}
+ .checkout-page .checkout-panel{padding:9px 8px;border-radius:15px}
+ .checkout-page .checkout-top{gap:8px;padding-bottom:7px}
+ .checkout-page .back-to-menu{padding:8px 10px;font-size:12px}
+ .checkout-page .checkout-heading{align-items:center;gap:6px;margin:7px 0}
+ .checkout-page .checkout-heading h2{font-size:clamp(22px,6vw,28px);margin:4px 0}
+ .checkout-page .checkout-heading p{font-size:10px;line-height:1.3}
+ .checkout-page .checkout-table-pill{padding:7px 9px;font-size:9px}
+ .checkout-page .checkout-layout{display:flex;flex-direction:column;gap:7px;height:auto;flex:1 1 auto;min-height:0;overflow:hidden}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%;height:auto;min-height:70px;padding:8px 10px}
+ .checkout-page .checkout-items-wrap>.checkout-section-title{margin-bottom:4px}
+ .checkout-page #cartRows{flex:1 1 0%;height:0;min-height:0;padding:0 9px 0 0;touch-action:pan-y}
+ .checkout-page #cartRows .cart-row{min-height:56px;padding:9px 0}
+ .checkout-page .checkout-summary{flex:0 1 48%;width:100%;max-height:48%;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:8px 10px}
+ .checkout-page .checkout-summary .checkout-section-title{margin-bottom:5px}
+ .checkout-page .checkout-summary .summary-line{padding:3px 0;font-size:10px}
+ .checkout-page .checkout-summary .summary-divider{margin:4px 0}
+ .checkout-page .checkout-summary .total-row{padding:5px 0 7px;font-size:14px}
+ .checkout-page .checkout-summary .field{margin:5px 0}
+ .checkout-page .checkout-summary .field label{font-size:8px}
+ .checkout-page .checkout-summary .field input{padding:7px 9px;min-height:34px}
+ .checkout-page .checkout-payment{margin:6px 0;padding:7px}
+ .checkout-page .payment-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ .checkout-page .payment-choice{font-size:9px;min-height:38px;padding:5px 4px;gap:3px}
+ .checkout-page .payment-detail{margin-top:6px;padding:7px}
+ .checkout-page .payment-detail .pay-amount{font-size:16px;margin:3px 0}
+ .checkout-page .payment-detail img{width:min(125px,100%);margin:5px auto}
+ .checkout-page .checkout-submit{min-height:38px;padding:8px 10px;font-size:12px}
+ .checkout-page .checkout-trust{font-size:8px;margin-top:4px}
+ .checkout-page .add-more-btn{padding:7px;margin-top:6px}
+ #staffView{padding:8px}
+ #staffView .staff-order-grid{grid-template-columns:minmax(0,1fr)!important}
+ #staffView .order{padding:13px!important}
+ #staffView .order h2{font-size:19px!important}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.checkout-page #cartRows{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Final compact layout + reliable nested cart scrolling */
+@media(min-width:761px){
+  .checkout-page main{height:calc(100dvh - 78px)!important;padding:7px 10px!important}
+  .checkout-page .checkout-panel{padding:clamp(10px,1.15vw,17px)!important}
+  .checkout-page .checkout-heading{margin:7px 0!important}
+  .checkout-page .checkout-heading h2{font-size:clamp(25px,2.4vw,32px)!important}
+  .checkout-page .checkout-heading p{font-size:12px!important}
+  .checkout-page .checkout-layout{grid-template-columns:minmax(0,1.55fr) minmax(290px,.8fr)!important;gap:12px!important}
+  .checkout-page .checkout-items-wrap,.checkout-page .checkout-summary{padding:clamp(10px,1.1vw,16px)!important;border-radius:16px!important}
+  .checkout-page .cart-row{padding:10px 0!important}
+  .checkout-page .cart-row>div:first-child strong{font-size:13px!important}
+  .checkout-page .qty{gap:6px!important}
+  .checkout-page .qty button{width:29px!important;height:29px!important}
+  #staffView{zoom:.92}
+}
+@media(max-width:760px){
+  .checkout-page{height:100dvh!important;overflow:hidden!important}
+  .checkout-page header{padding:10px 12px!important}
+  .checkout-page .top{gap:7px!important}
+  .checkout-page .brand{font-size:17px!important}
+  .checkout-page .tag{font-size:10px!important;margin-top:2px!important}
+  .checkout-page .table-pill{padding:7px 9px!important;font-size:10px!important}
+  .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;padding:5px!important;overflow:hidden!important}
+  .checkout-page .checkout-panel{height:100%!important;min-height:0!important;padding:8px!important;border-radius:14px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+  .checkout-page .checkout-top{padding-bottom:6px!important;gap:6px!important}
+  .checkout-page .back-to-menu{padding:7px 9px!important;font-size:11px!important}
+  .checkout-page .checkout-step{font-size:7px!important;letter-spacing:.6px!important}
+  .checkout-page .checkout-heading{margin:6px 0!important;gap:5px!important;align-items:center!important}
+  .checkout-page .checkout-heading h2{font-size:clamp(21px,5.5vw,26px)!important;line-height:1.05!important;margin:3px 0!important}
+  .checkout-page .checkout-heading p{font-size:9px!important;line-height:1.2!important}
+  .checkout-page .checkout-table-pill{padding:6px 8px!important;font-size:9px!important}
+  .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:6px!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+  .checkout-page .checkout-items-wrap{display:flex!important;flex:1 1 0%!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:0!important;padding:7px 9px!important;overflow:hidden!important}
+  .checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important;margin-bottom:3px!important;font-size:11px!important}
+  .checkout-page #cartRows{display:block!important;flex:1 1 0%!important;height:0!important;min-height:0!important;width:100%!important;overflow-y:auto!important;overflow-x:hidden!important;padding:0 7px 0 0!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+  .checkout-page #cartRows .cart-row{min-height:48px!important;padding:7px 0!important;gap:7px!important}
+  .checkout-page #cartRows .cart-row>div:first-child strong{font-size:11px!important;line-height:1.2!important}
+  .checkout-page #cartRows .cart-row .muted{font-size:10px!important}
+  .checkout-page .qty{gap:4px!important}
+  .checkout-page .qty{gap:5px!important;padding:2px!important}
+  .checkout-page .qty button{width:25px!important;height:25px!important;border-radius:7px!important}
+  .checkout-page .checkout-summary{position:static!important;display:block!important;flex:0 1 43%!important;width:100%!important;max-height:43%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:7px 9px!important}
+  .checkout-page .checkout-summary .checkout-section-title{font-size:11px!important;margin-bottom:3px!important}
+  .checkout-page .checkout-summary .summary-line{padding:3px 0!important;font-size:10px!important}
+  .checkout-page .checkout-summary .summary-line strong{font-size:11px!important}
+  .checkout-page .checkout-summary .total-row{font-size:13px!important;padding:5px 0 6px!important}
+  .checkout-page .checkout-summary .field{margin:4px 0!important}
+  .checkout-page .checkout-summary .field label{font-size:8px!important;margin-bottom:3px!important}
+  .checkout-page .checkout-summary .field input{min-height:31px!important;padding:6px 8px!important;font-size:12px!important}
+  .checkout-page .checkout-payment{padding:6px!important;margin:4px 0!important}
+  .checkout-page .checkout-payment .checkout-section-title{font-size:10px!important}
+  .checkout-page .payment-choice-grid{gap:3px!important}
+  .checkout-page .payment-choice{min-height:32px!important;padding:4px 3px!important;font-size:8px!important;gap:3px!important}
+  .checkout-page .payment-detail{margin-top:4px!important;padding:5px!important}
+  .checkout-page .payment-detail img{width:min(90px,100%)!important;margin:3px auto!important}
+  .checkout-page .payment-detail .pay-amount{font-size:14px!important}
+  .checkout-page .checkout-submit{min-height:34px!important;padding:6px 8px!important;font-size:11px!important}
+  .checkout-page .checkout-trust{font-size:8px!important;margin-top:3px!important}
+  .checkout-page .add-more-btn{padding:6px!important;margin-top:4px!important;font-size:10px!important}
+  #staffView{padding:6px!important}
+  #staffView .order{padding:10px!important}
+  #staffView .section-head{margin:8px 0!important}
+  #staffView .order h2{font-size:18px!important}
+  #staffView .muted{font-size:11px!important}
+  #staffView .order-actions{gap:6px!important}
+  #staffView .order-actions button{padding:8px 9px!important;font-size:11px!important}
+}
+.orders-page .timer-chip{display:none!important}
+.orders-page .orders-toolbar p.muted{display:none!important}
+#staffView .timer-chip{display:none!important}
+
+
+/* Checkout layout: fixed summary, only cart item list scrolls */
+.checkout-page .checkout-panel{display:flex!important;flex-direction:column!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-layout{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+.checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important}
+.checkout-page #cartRows{flex:1 1 0%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scroll-behavior:smooth!important;scrollbar-gutter:stable!important}
+.checkout-page .add-more-btn{flex:0 0 auto!important;position:relative!important;bottom:auto!important;width:100%!important;margin-top:8px!important}
+.checkout-page .checkout-summary{position:static!important;align-self:stretch!important;min-height:0!important;height:100%!important;max-height:100%!important;overflow:hidden!important;overscroll-behavior:none!important;display:flex!important;flex-direction:column!important}
+.checkout-page .checkout-summary>.checkout-section-title,
+.checkout-page .checkout-summary>.summary-line,
+.checkout-page .checkout-summary>.summary-divider,
+.checkout-page .checkout-summary>.total-row,
+.checkout-page .checkout-summary>.field,
+.checkout-page .checkout-summary>#checkoutPayment,
+.checkout-page .checkout-summary>.checkout-submit,
+.checkout-page .checkout-summary>.checkout-trust{flex-shrink:0!important}
+.checkout-page .checkout-summary #checkoutPayment{min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail{max-height:clamp(90px,30vh,300px)!important;overflow:hidden!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(150px,100%)!important;max-height:clamp(70px,18vh,170px)!important;object-fit:contain!important}
+@media(min-width:761px){
+ .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
+ .checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(300px,.8fr)!important;gap:clamp(10px,1.2vw,18px)!important}
+ .checkout-page .checkout-items-wrap,.checkout-page .checkout-summary{padding:clamp(10px,1.2vw,20px)!important}
+ .checkout-page .checkout-summary{position:static!important}
+}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;padding:5px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:6px!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;min-height:0!important}
+ .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;padding:6px 8px!important}
+ .checkout-page .checkout-summary .checkout-section-title{margin-bottom:2px!important}
+ .checkout-page .checkout-summary .summary-line{padding:2px 0!important}
+ .checkout-page .checkout-summary .total-row{padding:3px 0 4px!important}
+ .checkout-page .checkout-summary .field{margin:3px 0!important}
+ .checkout-page .checkout-summary .field input{min-height:27px!important;padding:4px 7px!important}
+ .checkout-page .checkout-summary .checkout-payment{padding:4px!important;margin:3px 0!important}
+ .checkout-page .checkout-summary .payment-detail{margin-top:3px!important;padding:3px!important}
+ .checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(70px,100%)!important;max-height:70px!important;margin:2px auto!important}
+ .checkout-page .checkout-summary .payment-detail small{font-size:8px!important;line-height:1.15!important}
+ .checkout-page .checkout-summary .payment-detail .pay-amount{font-size:12px!important}
+ .checkout-page .checkout-summary .payment-choice{min-height:28px!important;padding:3px!important;font-size:8px!important}
+ .checkout-page .checkout-summary .checkout-submit{min-height:30px!important;padding:5px 7px!important}
+ .checkout-page .checkout-summary .checkout-trust{font-size:7px!important;margin-top:2px!important}
+ .checkout-page .add-more-btn{margin-top:5px!important;padding:6px!important}
+}
+
+
+/* Final customer/staff scroll consistency: natural page scroll outside the checkout */
+html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+body{overscroll-behavior-y:contain}
+#staffView,#staffView #dashboard,#staffView #tablesPage{min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important}
+#staffView{overflow:visible!important;overscroll-behavior:initial!important}
+#staffView #orders{height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:initial!important}
+#staffView .panel,#staffView .order,#staffView #editRequests{overflow:visible!important}
+#staffView .staff-order-grid{overflow:visible!important}
+#staffView #tableLinks{overflow:visible!important}
+#staffView .order-actions{flex-wrap:wrap!important}
+@media(max-width:760px){
+ body:not(.checkout-page){overflow-x:hidden!important;overflow-y:auto!important}
+ body:not(.checkout-page) #staffView{padding-bottom:24px!important}
+ body:not(.checkout-page) #staffView .panel{margin-bottom:12px!important}
+ body:not(.checkout-page) #staffView .staff-order-grid{gap:10px!important}
+}
+
+
+/* Checkout scroll/layout correction: list scrolls independently; summary stays in view. */
+html,body{min-height:100%;overscroll-behavior-y:auto}
+body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+.checkout-page{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto!important}
+.checkout-page .checkout-heading{margin:14px 0!important}
+.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(300px,.8fr)!important;gap:16px!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+.checkout-page #cartRows{flex:1 1 auto!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+.checkout-page .add-more-btn{flex:0 0 auto!important;margin-top:12px!important}
+.checkout-page .checkout-summary{position:sticky!important;top:12px!important;align-self:start!important;max-height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;scrollbar-gutter:stable!important}
+#appModal.modal-backdrop{position:fixed!important;inset:0!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important}#appModal.modal-backdrop:not(.hidden){display:flex!important}#appModal.modal-backdrop.hidden{display:none!important;pointer-events:none!important}
+#appModal .modal-card{max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;margin:auto!important}
+@media(max-width:760px){
+ .checkout-page{height:100dvh!important;overflow:hidden!important}
+ .checkout-page main{height:calc(100dvh - 66px)!important;padding:6px 8px 8px!important;overflow:hidden!important}
+ .checkout-page #cartPanel{padding:12px!important;border-radius:18px!important}
+ .checkout-page .checkout-top{padding-bottom:10px!important}
+ .checkout-page .checkout-heading{margin:10px 0!important;gap:8px!important}
+ .checkout-page .checkout-heading h2{font-size:29px!important}
+ .checkout-page .checkout-heading p{font-size:11px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:10px!important;overflow-y:auto!important;overflow-x:hidden!important;min-height:0!important;height:0!important;flex:1 1 auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+ .checkout-page .checkout-items-wrap{height:auto!important;min-height:240px!important;flex:0 0 min(48dvh,430px)!important;overflow:hidden!important;padding:12px!important}
+ .checkout-page #cartRows{height:0!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+ .checkout-page .checkout-summary{position:static!important;top:auto!important;max-height:none!important;height:auto!important;overflow:visible!important;flex:0 0 auto!important;padding:14px!important}
+ .checkout-page .checkout-page .field{margin:10px 0!important}
+ #appModal.modal-backdrop{padding:14px!important;align-items:center!important}
+ #appModal .modal-card{max-height:calc(100dvh - 28px)!important}
+}
+
+
+/* Cart visibility and scrolling: preserve the full panel height; only item rows scroll. */
+.checkout-page{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.checkout-page #customerView{height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel{display:flex!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;flex-direction:column!important}
+.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr)!important;gap:16px!important;height:auto!important;min-height:0!important;flex:1 1 0%!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{height:100%!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.checkout-page #cartRows{display:block!important;flex:1 1 0%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+.checkout-page .add-more-btn{flex:0 0 auto!important;margin-top:12px!important}
+.checkout-page .checkout-summary{position:relative!important;top:auto!important;align-self:stretch!important;height:auto!important;max-height:100%!important;min-height:0!important;overflow:hidden!important;overscroll-behavior:initial!important}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 66px)!important;padding:6px 8px!important}
+ .checkout-page #cartPanel{padding:10px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:10px!important;height:auto!important;min-height:0!important;flex:1 1 0%!important;overflow:hidden!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;height:auto!important;min-height:0!important}
+ .checkout-page #cartRows{min-height:0!important;height:0!important}
+ .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:hidden!important}
+}
+
+
+/* Cart recovery: guarantee the checkout panel is visible and has a real layout height. */
+.checkout-page #customerView{display:block!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;flex-direction:column!important;width:100%!important;max-width:1600px!important;height:100%!important;min-height:0!important;flex:1 1 auto!important;margin:0 auto!important}
+.checkout-page main{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex-shrink:0!important}
+.checkout-page .checkout-layout{width:100%!important;min-width:0!important;min-height:0!important;flex:1 1 0%!important;height:auto!important}
+.checkout-page .checkout-items-wrap{min-width:0!important}
+.checkout-page .checkout-summary{min-width:0!important}
+.checkout-page #cartRows{min-height:0!important}
+.checkout-page #cartPanel.hidden{display:flex!important}
+@media(max-width:760px){
+ .checkout-page #cartPanel{height:100%!important;min-height:0!important}
+ .checkout-page .checkout-layout{min-height:0!important;flex:1 1 0%!important}
+}
+
+
+/* FINAL CART: screenshot-matched fixed frame; only the item list scrolls. */
+.checkout-page{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.checkout-page main{display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:calc(100dvh - 64px)!important;min-height:0!important;overflow:hidden!important;padding:8px 10px!important}
+.checkout-page #customerView{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel,.checkout-page #cartPanel.hidden{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;flex:1 1 auto!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0 auto!important;padding:clamp(12px,1.6vw,24px)!important;overflow:hidden!important}
+.checkout-page .checkout-top{flex:0 0 auto!important;padding-bottom:12px!important}
+.checkout-page .checkout-heading{flex:0 0 auto!important;margin:10px 0 14px!important}
+.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.8fr) minmax(330px,1fr)!important;gap:14px!important;flex:1 1 0%!important;width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important;margin-bottom:8px!important}
+.checkout-page #cartRows{display:block!important;flex:1 1 0%!important;width:100%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+.checkout-page .add-more-btn{display:flex!important;flex:0 0 auto!important;width:100%!important;margin-top:10px!important}
+.checkout-page .checkout-summary{position:relative!important;top:auto!important;align-self:stretch!important;width:100%!important;height:100%!important;max-height:100%!important;min-height:0!important;overflow:visible!important;overscroll-behavior:initial!important}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 62px)!important;padding:5px!important}
+ .checkout-page #cartPanel,.checkout-page #cartPanel.hidden{padding:10px!important;border-radius:16px!important}
+ .checkout-page .checkout-top{padding-bottom:8px!important}
+ .checkout-page .checkout-heading{margin:8px 0!important;gap:6px!important}
+ .checkout-page .checkout-heading h2{font-size:25px!important}
+ .checkout-page .checkout-heading p{font-size:10px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:8px!important;flex:1 1 0%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;height:auto!important;min-height:0!important;padding:9px!important}
+ .checkout-page #cartRows{height:0!important;min-height:0!important}
+ .checkout-page .add-more-btn{margin-top:7px!important;padding:9px!important}
+ .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:10px!important}
+ .checkout-page .checkout-summary .field{margin:7px 0!important}
+ .checkout-page .checkout-summary .payment-detail{padding:8px!important}
+ .checkout-page .checkout-summary img{max-height:90px!important;width:auto!important}
+}
+
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand">THYME <span>&</span> WHISK.</div><div class="tag">Good food. Good mood.</div></div><div style="display:flex;align-items:center;gap:8px"><button id="customerRefreshBtn" class="secondary" onclick="window.location.reload()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">↻ Refresh</button><button id="customerOrdersBtn" class="secondary hidden" onclick="openCustomerOrders()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">Orders <span id="customerOrdersCount"></span></button><div class="table-pill" id="tableLabel">Finding your table...</div></div></div></header>
+<main><div id="notice" class="notice hidden"></div><div id="appModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><div class="confirm-icon" style="margin:0 0 16px">?</div><h2 id="modalTitle" style="font-size:25px">Confirm action</h2><p id="modalMessage" class="muted" style="line-height:1.6"></p><div class="order-actions" style="justify-content:flex-end"><button class="secondary" onclick="closeModal()">Cancel</button><button id="modalConfirmBtn" class="primary" onclick="confirmModalAction()">Confirm</button></div></div></div><section id="customerView"><section id="customerOrdersPanel" class="panel hidden"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><div><div class="eyebrow">Your table</div><h2>Active orders</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="liquid-btn" onclick="backToMenu()"><span>← Back to menu</span></button></div></div><div id="customerOrdersList"></div></section>
+<div class="hero"><div class="hero-copy"><div class="eyebrow">Made fresh, served with love</div><h1>A little taste of happiness.</h1><p>Explore our menu, choose your favourites and order right from your table.</p></div><img src="coldcoffee.jpg" alt="" onerror="this.style.display='none'"></div>
+<div class="section-head"><div><div class="eyebrow">Our kitchen</div><h2>Find your favourite</h2></div><span id="menuCount" class="muted"></span></div><div id="categories" class="categories"></div><div id="menu" class="grid">Loading fresh menu...</div>
+<section id="cartPanel" class="panel hidden checkout-panel"><div class="checkout-top"><button class="back-to-menu" onclick="closeCart()">← Back to menu</button><div class="checkout-step">SECURE TABLE ORDER</div></div><div class="checkout-heading"><div><div class="eyebrow">YOUR SELECTION</div><h2>Your cart</h2><p class="muted">Review your favourites before sending them to our kitchen.</p></div><div class="checkout-table-pill" id="checkoutTablePill">TABLE 01</div></div><div class="checkout-layout"><div class="checkout-items-wrap"><div class="checkout-section-title">Items in your order <span id="checkoutItemCount">0 items</span></div><div id="cartRows"></div><button class="add-more-btn" onclick="closeCart()">＋ Add more items</button></div><aside class="checkout-summary"><div class="checkout-section-title">Order summary</div><div class="summary-line"><span>Subtotal</span><strong id="checkoutSubtotal">₹0</strong></div><div class="summary-line"><span>Service</span><span class="included">At your table</span></div><div class="summary-divider"></div><div class="total-row"><span>Total</span><span id="cartTotal">₹0</span></div><div class="field"><label for="customerName">YOUR NAME *</label><input id="customerName" maxlength="100" placeholder="Enter your name" autocomplete="name"></div><div class="field"><label for="customerPhone">PHONE NUMBER (OPTIONAL)</label><input id="customerPhone" maxlength="20" type="tel" placeholder="Enter mobile number" autocomplete="tel"></div><div id="checkoutPayment" class="checkout-payment hidden"><div class="checkout-section-title">Payment method <span>Choose how to pay</span></div><div id="checkoutPaymentChoices" class="payment-choice-grid"></div><div id="checkoutPaymentDetail" class="payment-detail hidden"></div></div><button class="primary checkout-submit" id="submitBtn" style="width:100%" onclick="submitOrder()">Place my order <span>→</span></button><div class="checkout-trust"><span>✓</span> Your order is sent directly to our restaurant team.</div></aside></div></section>
+<section id="confirmation" class="panel hidden"><div class="confirm"><div class="confirm-icon">✓</div><div class="eyebrow" style="margin-top:18px">Order received</div><h2 style="margin-top:9px">You're all set!</h2><p class="muted">Show this number to your waiter if you need help.</p><div id="confirmationCode" class="order-code">#------</div><p id="confirmationTotal"></p><p id="confirmationTable" class="muted"></p><button class="primary" onclick="newOrder()">Order something else</button></div></section>
+</section>
+<section id="staffView" class="hidden"><div class="panel" id="loginPanel"><div class="eyebrow">Team access</div><h2>Staff dashboard</h2><p class="muted">Sign in using your Supabase staff account.</p><form id="loginForm"><div class="field"><label>Email</label><input id="staffEmail" type="email" required autocomplete="username"></div><div class="field"><label>Password</label><input id="staffPassword" type="password" required autocomplete="current-password"></div><button class="primary" style="width:100%">Sign in</button></form></div><div id="dashboard" class="hidden"><div class="panel"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><h2>Kitchen & orders</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" onclick="openTablesPage()">All tables</button></div></div><p class="muted">Orders refresh here. Every order shows the table number it came from.</p><button class="secondary" onclick="logout()">Sign out</button></div><div id="editRequests"></div><div id="orders"></div></div><div id="tablesPage" class="hidden"><div class="panel"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><div><div class="eyebrow">Table management</div><h2>All 10 tables</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" onclick="copyAllTableLinks()">Copy all links</button><button class="secondary" onclick="backToKitchen()">← Kitchen</button></div></div><p class="muted">Select a table to copy its customer order link or open the order page. QR codes are available in the printable QR sheet.</p><div id="tableLinks" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></div></div></div></section>
+</main><div id="bottomCart" class="bottom-cart hidden"><div><strong id="bottomTotal">₹0</strong><div id="bottomCount" class="cart-count">0 items</div></div><button onclick="openCart()">View cart →</button></div><footer>Prepared with care · Thyme & Whisk</footer>
+<script>
+const SUPABASE_URL="https://savepmyxoctonhjqgdxj.supabase.co";
+const SUPABASE_KEY="sb_publishable_JAYqblm99lorQYbwKYDRgg_gFP-cgYo";
+const DEFAULT_RESTAURANT="11111111-1111-4111-8111-111111111111";
+const DEFAULT_TABLE="22222222-2222-4222-8222-222222222222";
+const STAFF_AUTH_STORAGE_KEY="qr-staff-auth-v1";
+const LEGACY_AUTH_STORAGE_KEY="sb-savepmyxoctonhjqgdxj-auth-token";
+try{if(!localStorage.getItem("qr-staff-auth-migration-done-v1")){if(!localStorage.getItem(STAFF_AUTH_STORAGE_KEY)){const legacy=localStorage.getItem(LEGACY_AUTH_STORAGE_KEY);if(legacy)localStorage.setItem(STAFF_AUTH_STORAGE_KEY,legacy)}localStorage.setItem("qr-staff-auth-migration-done-v1","1")}}catch(e){console.warn("Could not migrate saved staff session",e)}
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:STAFF_AUTH_STORAGE_KEY}});
+const params=new URLSearchParams(location.search),restaurantId=params.get("restaurant")||DEFAULT_RESTAURANT,tableId=params.get("table")||DEFAULT_TABLE,staffMode=params.get("staff")==="1",tablesPage=params.get("tables")==="1",ordersPage=params.get("orders")==="1",checkoutPage=params.get("checkout")==="1",addToOrderMode=params.get("addToOrder")==="1",selectedOrderId=params.get("targetOrder")||"";
+let menuItems=[],cart={},activeCategory="All",tableNumber="1",channel=null,customerOrderChannel=null,menuSyncChannel=null,menuSyncTimer=null,menuSyncBusy=false,menuSyncSignature="",pendingModalAction=null,customerEditing={},customerEditStatus={},customerDrafts={},customerApprovalUntil={},customerRequestUsage={},customerApprovalStaff={},orderTimer=null,editPollTimer=null,syncPollTimer=null,syncPollBusy=false;
+const staffAcceptTimes={};const $=id=>document.getElementById(id),money=n=>"₹"+Number(n||0).toFixed(2);
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function notify(message,type="info"){
+ const legacy=$("notice");if(legacy)legacy.classList.add("hidden");
+ let stack=$("toastStack");if(!stack){stack=document.createElement("div");stack.id="toastStack";stack.setAttribute("aria-live","polite");stack.setAttribute("aria-atomic","false");document.body.appendChild(stack)}
+ const el=document.createElement("div");el.className="app-toast "+(type==="error"?"error":type==="success"?"success":"");el.textContent=String(message);stack.appendChild(el);
+ window.setTimeout(()=>{el.classList.add("out");window.setTimeout(()=>el.remove(),170)},1000);
+}
+function shortCode(id){return String(id||"").replace(/-/g,"").slice(0,6).toUpperCase()}
+async function init(){$("customerView").classList.toggle("hidden",staffMode);$("staffView").classList.toggle("hidden",!staffMode);$("customerRefreshBtn").classList.remove("hidden");$("customerRefreshBtn").textContent="↻ Refresh";if(staffMode){await checkSession();return}if(ordersPage){document.body.classList.add("orders-page");$("customerOrdersPanel").classList.remove("hidden")}if(checkoutPage)document.body.classList.add("checkout-page");await loadTable();await Promise.all([loadMenu(),loadCustomerOrders(),loadCheckoutPaymentSettings()]);try{const saved=JSON.parse(sessionStorage.getItem("qr-cart-v1")||"{}");cart={};Object.entries(saved).forEach(([id,q])=>{const item=menuItems.find(x=>x.id===id);if(item&&Number(q)>0)cart[id]={item,quantity:Math.min(50,Number(q))}})}catch(e){cart={}}renderCart();startCustomerLiveSync();if(addToOrderMode){$("submitBtn").textContent="Add to existing order →";if(checkoutPage){$("cartPanel").classList.remove("hidden");$("checkoutTablePill").textContent="TABLE "+tableNumber;await renderTargetOrderPicker()}else await openCart()}else if(checkoutPage){$("cartPanel").classList.remove("hidden");$("checkoutTablePill").textContent="TABLE "+tableNumber;if(!cartCount())notify("Your cart is empty. Choose items from the menu first.","error")}}
+function buildUpiIntent(){const cfg=checkoutPaymentConfig;const amount=Number(cartTotal()).toFixed(2);if(cfg.upiId){const p=new URLSearchParams({pa:cfg.upiId,pn:cfg.payeeName||"Restaurant",am:amount,cu:"INR",tn:"Table "+tableNumber+" order"});return "upi://pay?"+p.toString()}return cfg.paymentUrl||""}
+function renderCheckoutPayment(){const wrap=$("checkoutPayment"),choices=$("checkoutPaymentChoices"),detail=$("checkoutPaymentDetail");if(!wrap||!choices||!detail)return;const cfg=checkoutPaymentConfig,methods=Array.isArray(cfg.methods)?cfg.methods:[];wrap.classList.toggle("hidden",!methods.length);if(!methods.length)return;if(!methods.includes(selectedPaymentMethod))selectedPaymentMethod=methods[0];const labels={cash:"💵 Cash",upi:"📱 UPI apps",qr:"▦ Scan QR"};choices.innerHTML=methods.map(m=>'<label class="payment-choice '+(selectedPaymentMethod===m?"active":"")+'"><input type="radio" name="checkoutPayMethod" value="'+m+'" '+(selectedPaymentMethod===m?"checked":"")+' onchange="selectPaymentMethod(\''+m+'\')"><span>'+labels[m]+'</span></label>').join("");detail.classList.remove("hidden");if(selectedPaymentMethod==="cash"){detail.innerHTML='<strong>Pay at your table</strong><small>Pay cash directly to the restaurant team. No online payment is started.</small>';return}const intent=buildUpiIntent(),amount=Number(cartTotal()).toFixed(2),qrData=intent||cfg.paymentUrl;let qrSrc="";if(selectedPaymentMethod==="qr"){if(intent)qrSrc="https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data="+encodeURIComponent(intent);else if(cfg.qrUrl)qrSrc=cfg.qrUrl}if(selectedPaymentMethod==="upi"){detail.innerHTML='<strong>Pay securely with your UPI app</strong><div class="pay-amount">₹'+amount+'</div><small>'+(cfg.upiId?'Amount prefilled for '+esc(cfg.payeeName||"Restaurant")+' · '+esc(cfg.upiId):'Using the restaurant payment link configured by the owner. Amount prefill depends on that link.')+'</small><button class="upi-launch" type="button" onclick="launchUpiPayment()">Open UPI app chooser →</button>'}else{detail.innerHTML='<strong>Scan to pay</strong><div class="pay-amount">₹'+amount+'</div>'+(qrSrc?'<img src="'+esc(qrSrc)+'" alt="UPI payment QR code" loading="eager">':'<p>Owner has not configured a UPI ID or QR image yet.</p>')+'<small>'+(intent?'This QR encodes the UPI ID and exact order amount. Check the amount in your UPI app before paying.':'A static QR may not prefill the amount; verify it in your payment app.')+'</small>'+(intent?'<button class="upi-launch" type="button" onclick="launchUpiPayment()">Open UPI app chooser →</button>':'')}}
+function selectPaymentMethod(method){if(!checkoutPaymentConfig.methods.includes(method))return;selectedPaymentMethod=method;renderCheckoutPayment()}
+function launchUpiPayment(){const url=buildUpiIntent();if(!url){notify("Ask the restaurant to configure a UPI ID or payment URL.","error");return}window.location.href=url}
+async function loadCheckoutPaymentSettings(){const {data,error}=await db.from("restaurants").select("payment_methods,payment_upi_id,payment_payee_name,payment_url,payment_qr_url").eq("id",restaurantId).maybeSingle();if(error){console.warn("Checkout payment settings could not load",error);checkoutPaymentConfig={methods:["cash"],upiId:"",payeeName:"Thyme & Whisk",paymentUrl:"",qrUrl:""};return}if(data){checkoutPaymentConfig={methods:Array.isArray(data.payment_methods)?data.payment_methods:["cash"],upiId:data.payment_upi_id||"",payeeName:data.payment_payee_name||"Thyme & Whisk",paymentUrl:data.payment_url||"",qrUrl:data.payment_qr_url||""};selectedPaymentMethod=checkoutPaymentConfig.methods[0]||"cash"}renderCheckoutPayment()}
+async function loadTable(){const {data,error}=await db.from("restaurant_tables").select("table_number").eq("id",tableId).eq("restaurant_id",restaurantId).maybeSingle();if(error||!data){$("tableLabel").textContent="Table not found";notify("This QR table is not configured correctly. Please contact the restaurant.","error");return}tableNumber=String(data.table_number).replace(/^0+/,"")||"1";$("tableLabel").textContent="TABLE "+tableNumber;$("confirmationTable").textContent="Table "+tableNumber;$("customerOrdersBtn").classList.remove("hidden");subscribeCustomerOrders()}
+async function loadMenu(showLoading=true){if(showLoading)$("menu").textContent="Loading menu...";const {data,error}=await db.from("menu_items").select("id,name,price,category,image_path,is_available").eq("restaurant_id",restaurantId).order("name");if(error){if(showLoading)$("menu").textContent="Menu could not be loaded.";notify("Menu error: "+error.message,"error");return}menuItems=data||[];menuSyncSignature=JSON.stringify(menuItems);renderCategories();renderMenu()}
+async function syncLiveMenu(){if(menuSyncBusy||document.hidden||staffMode)return;menuSyncBusy=true;try{const {data,error}=await db.from("menu_items").select("id,name,price,category,image_path,is_available").eq("restaurant_id",restaurantId).order("name");if(error)return;const next=data||[],signature=JSON.stringify(next);if(signature===menuSyncSignature)return;menuSyncSignature=signature;const byId=new Map(next.map(item=>[item.id,item]));let removed=0;for(const id of Object.keys(cart)){const fresh=byId.get(id);if(!fresh||!fresh.is_available){delete cart[id];removed++}else cart[id].item=fresh}menuItems=next;renderCategories();renderMenu();renderCart();if(removed)notify("Your cart was updated because an item became unavailable or was removed.","info")}finally{menuSyncBusy=false}}
+function startCustomerLiveSync(){if(staffMode)return;if(menuSyncChannel)db.removeChannel(menuSyncChannel);menuSyncChannel=db.channel("customer-live-menu-"+restaurantId+"-"+tableId).on("postgres_changes",{event:"*",schema:"public",table:"menu_items",filter:"restaurant_id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurants",filter:"id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurant_tables",filter:"id=eq."+tableId},()=>syncLiveMenu()).subscribe();if(menuSyncTimer)clearInterval(menuSyncTimer);menuSyncTimer=setInterval(()=>{if(!document.hidden)syncLiveMenu()},1000)}
+function renderCategories(){const cats=["All",...new Set(menuItems.map(x=>x.category||"Popular"))];if(!cats.includes(activeCategory))activeCategory="All";$("categories").innerHTML=cats.map(c=>'<button class="'+(c===activeCategory?"active":"")+'" onclick="setCategory(\''+esc(c)+'\')">'+esc(c)+"</button>").join("");$("menuCount").textContent=menuItems.length+" items"}
+function setCategory(c){activeCategory=c;renderCategories();renderMenu()}
+// Images are stored at the root of the GitHub Pages site. Prefer the exact database image_path.
+const IMAGE_BY_NORMALIZED_NAME={
+  alfredopasta:"alfredopasta.jpg",bakedpasta:"bakedpasta.jpg",biryani:"biryani.jpg",brownie:"brownie.jpg",
+  butternaan:"butternaan.jpg",cappuccino:"cappuccino.jpg",chai:"masala-chai.jpg",masalachai:"masalachai.jpg",
+  cheeseballs:"cheeseballs.jpg",cheeseburger:"cheeseburger.jpg",cheesefries:"cheesefries.jpg",cheesesandwich:"cheesesandwich.jpg",
+  chillipaneer:"chillipaneer.jpg",chocolatecoldcoffee:"chocolatecoldcoffee.jpg",chocolateshake:"chocolateshake.jpg",
+  classicburger:"burger.jpg",classicpasta:"pasta.jpg",classicpizza:"pizza.jpg",classicsandwich:"sandwich.jpg",
+  clubsandwich:"clubsandwich.jpg",coffee:"coffee.jpg",coldcoffee:"coldcoffee.jpg",creamycoffee:"ccoffee.jpg",
+  daltadka:"daltadka.jpg",farmhousepizza:"farmhousepizza.jpg",frenchfries:"frenchfries.jpg",freshlimesoda:"freshlimesoda.jpg",
+  gulabjamun:"gulabjamun.jpg",hotcoffee:"hotcoffee.jpg",icecream:"ice-cream.jpg",jeerarice:"jeerarice.jpg",
+  lemonade:"lemonade.jpg",mangoshake:"mangoshake.jpg",margheritapizza:"margheritapizza.jpg",mineralwater:"mineralwater.jpg",
+  mozzarellasticks:"mozzarellasticks.jpg",onionrings:"onionrings.jpg",oreoshake:"oreoshake.jpg",paneerburger:"paneerburger.jpg",
+  paneerbuttermasala:"paneerbuttermasala.jpg",paneersandwich:"paneersandwich.jpg",paneertikka:"paneertikka.jpg",
+  pastaclassic:"pasta.jpg",periperifries:"periperifries.jpg",potatowedges:"potatowedges.jpg",redsaucepasta:"redsaucepasta.jpg",
+  specialpizza:"specialpizza.jpg",springrolls:"springrolls.jpg",strawberryshake:"strawberryshake.jpg",
+  vanilllaicecream:"vanillaicecream.jpg",vanillaicecream:"vanillaicecream.jpg",vegburger:"vegburger.jpg",
+  vegfriedrice:"vegfriedrice.jpg",vegfriedricespecial:"vegfriedrice.jpg",veghakkanoodles:"veghakkanoodles.jpg",
+  vegmanchurian:"vegmanchurian.jpg",vegnuggets:"vegnuggets.jpg",vegpakora:"vegpakora.jpg",vegpulao:"vegpulao.jpg",
+  vegsandwich:"vegsandwich.jpg",vegsandwichspecial:"vegsandwich.jpg",whitesaucepasta:"whitesaucepasta.jpg"
+};
+function imageFor(item){
+  const path=String(item?.image_path||"").trim();
+  // Supabase's path must be a simple root filename, not an injected URL.
+  if(path && /^[a-z0-9-]+\.jpg$/i.test(path))return "https://raw.githubusercontent.com/mayuu-p/tester/main/"+encodeURIComponent(path)+"?v=2";
+  const normalized=String(item?.name||item?.item_name||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+  return IMAGE_BY_NORMALIZED_NAME[normalized]||"";
+}
+function imageFallback(img){img.onerror=null;img.style.display="none";const label=img.parentElement?.querySelector(".photo-label");if(label)label.textContent="Photo coming soon"}
+function renderMenu(){const list=menuItems.filter(x=>activeCategory==="All"||(x.category||"Popular")===activeCategory);if(!list.length){$("menu").innerHTML="<p>No items in this category yet.</p>";return}$("menu").innerHTML=list.map((item,index)=>{const src=imageFor(item);const loading=index<6?"eager":"lazy";return '<article class="card" style="animation-delay:'+Math.min(index*35,250)+'ms"><div class="photo">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="'+esc(item.name)+'" onerror="imageFallback(this)">':'<div style="height:100%;display:grid;place-items:center;color:#777d75;font-size:12px">Photo coming soon</div>')+'<span class="photo-label">'+esc(item.category||"Popular")+'</span></div><div class="card-body"><h3>'+esc(item.name)+'</h3><div class="desc">Freshly prepared · Made to order</div><div class="card-foot"><span class="price">'+money(item.price)+'</span>'+(item.is_available?'<button class="add" aria-label="Add '+esc(item.name)+'" onclick="addItemByIndex('+index+')">+</button>':'<span class="unavailable-pill">Unavailable</span>')+'</div></div></article>'}).join("")}
+function addItemByIndex(index){const item=menuItems[index];if(item)addItem(item.id)}
+function addItem(id){const item=menuItems.find(x=>x.id===id);if(!item)return;if(item.is_available===false){notify(item.name+" is currently unavailable.","error");return}if(!cart[id])cart[id]={item,quantity:0};if(cart[id].quantity<50)cart[id].quantity++;renderCart()}
+function changeQty(id,delta){if(!cart[id])return;cart[id].quantity+=delta;if(cart[id].quantity<=0)delete cart[id];renderCart()}
+function cartTotal(){return Object.values(cart).reduce((s,x)=>s+Number(x.item.price)*x.quantity,0)}
+function cartCount(){return Object.values(cart).reduce((s,x)=>s+x.quantity,0)}
+function renderCart(){const entries=Object.values(cart);try{sessionStorage.setItem("qr-cart-v1",JSON.stringify(Object.fromEntries(entries.map(({item,quantity})=>[item.id,quantity]))))}catch(e){}$("bottomCart").classList.toggle("hidden",!entries.length||checkoutPage);$("bottomTotal").textContent=money(cartTotal());$("bottomCount").textContent=cartCount()+" items";const bottomButton=$("bottomCart").querySelector("button");if(bottomButton)bottomButton.textContent=addToOrderMode?"View placed order →":"View cart →";$("cartTotal").textContent=money(cartTotal());if($("checkoutSubtotal"))$("checkoutSubtotal").textContent=money(cartTotal());if($("checkoutItemCount"))$("checkoutItemCount").textContent=cartCount()+" item"+(cartCount()===1?"":"s");if($("checkoutPayment"))renderCheckoutPayment();$("cartRows").innerHTML=entries.map(({item,quantity})=>'<div class="cart-row"><div><strong>'+esc(item.name)+'</strong><div class="muted">'+money(item.price)+' each</div></div><div class="qty"><button onclick="changeQty(\''+item.id+'\',-1)">−</button><strong>'+quantity+'</strong><button onclick="changeQty(\''+item.id+'\',1)">+</button></div></div>').join("")}
+async function openCart(){if(!cartCount())return notify("Please add food to your cart first.","error");try{sessionStorage.setItem("qr-cart-v1",JSON.stringify(Object.fromEntries(Object.values(cart).map(({item,quantity})=>[item.id,quantity]))))}catch(e){}const next=new URLSearchParams({restaurant:restaurantId,table:tableId,checkout:"1"});if(addToOrderMode){next.set("addToOrder","1");if(selectedOrderId)next.set("targetOrder",selectedOrderId)}location.href=location.pathname+"?"+next.toString()}
+async function renderTargetOrderPicker(){let el=$("targetOrderPicker");if(!el){el=document.createElement("div");el.id="targetOrderPicker";$("cartRows").before(el)}el.innerHTML='<p class="muted">Choose which existing order should receive these cart items:</p><select id="targetOrderSelect" class="field-control" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px"><option>Loading your active orders...</option></select>';const {data,error}=await db.from("orders").select("id,order_code,created_at,status,total").eq("restaurant_id",restaurantId).eq("table_id",tableId).not("status","in","(served,cancelled)").order("created_at",{ascending:false});const sel=$("targetOrderSelect");if(error||!data||!data.length){sel.innerHTML='<option value="">No active orders found</option>';return}sel.innerHTML=data.map(o=>'<option value="'+o.id+'">'+esc(o.order_code||shortCode(o.id))+' · '+esc(o.status)+' · '+money(o.total)+'</option>').join("");if(selectedOrderId&&data.some(o=>o.id===selectedOrderId)){sel.value=selectedOrderId;sel.disabled=true;sel.title="This is the order you chose to edit."}else{selectedOrderId=sel.value;sel.onchange=()=>selectedOrderId=sel.value}}
+function closeCart(){if(checkoutPage){const next=new URLSearchParams({restaurant:restaurantId,table:tableId});if(addToOrderMode){next.set("addToOrder","1");if(selectedOrderId)next.set("targetOrder",selectedOrderId)}location.href=location.pathname+"?"+next.toString();return}$("cartPanel").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+async function submitOrder(confirmed=false){if(!confirmed){pendingModalAction=()=>submitOrder(true);showModal(addToOrderMode?"Confirm order edit":"Confirm your order",addToOrderMode?"Add the selected cart items to this existing order?":"Place this order with the items and total currently shown in your cart?","Yes, continue");return}const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim(),entries=Object.values(cart);if(addToOrderMode){if(!entries.length)return notify("Please add food to your cart first.","error");const target=$("targetOrderSelect")?.value||selectedOrderId;if(!target)return notify("Choose an existing order first.","error");const btn=$("submitBtn");btn.disabled=true;btn.textContent="Adding to existing order...";try{const {data:oldItems,error:readError}=await db.from("order_items").select("menu_item_id,quantity").eq("order_id",target);if(readError)throw readError;const merged={};(oldItems||[]).forEach(i=>{if(i.menu_item_id)merged[i.menu_item_id]=Number(i.quantity)||0});entries.forEach(x=>merged[x.item.id]=(merged[x.item.id]||0)+x.quantity);const changes=Object.entries(merged).map(([id,quantity])=>({id,quantity}));const {error}=await db.rpc("apply_table_order_edit",{p_order_id:target,p_table_id:tableId,p_changes:changes});if(error)throw error;cart={};try{sessionStorage.removeItem("qr-cart-v1")}catch(e){}renderCart();notify("Items added to the selected order.");location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)+"&orders=1"}catch(e){notify("Could not add items to existing order: "+e.message,"error")}finally{btn.disabled=false;btn.textContent="Add to existing order →"}return}if(!name)return notify("Please enter your name.","error");if(!entries.length)return notify("Please add food to your cart first.","error");if(!tableId||!restaurantId)return notify("Invalid QR code.","error");const btn=$("submitBtn");btn.disabled=true;btn.textContent="Sending order...";try{const {data,error}=await db.rpc("create_order_with_payment",{p_restaurant_id:restaurantId,p_table_id:tableId,p_customer_name:name,p_customer_phone:phone||null,p_items:entries.map(x=>({id:x.item.id,quantity:x.quantity})),p_payment_method:checkoutPaymentConfig.methods.includes(selectedPaymentMethod)?selectedPaymentMethod:"cash"});if(error)throw error;const total=cartTotal();const paymentIntent=(selectedPaymentMethod==="upi")?buildUpiIntent():"";$("confirmationCode").textContent="#"+shortCode(data);$("confirmationTotal").textContent="Order total: "+money(total)+" · "+({cash:"Cash at table",upi:"UPI payment pending confirmation",qr:"QR payment pending confirmation"}[selectedPaymentMethod]||"");$("confirmationTable").textContent="Table "+tableNumber;cart={};try{sessionStorage.removeItem("qr-cart-v1")}catch(e){}renderCart();$("cartPanel").classList.add("hidden");document.body.classList.remove("checkout-page");$("confirmation").classList.remove("hidden");$("confirmation").classList.add("order-success-overlay");if(window.orderSuccessTimer)clearTimeout(window.orderSuccessTimer);window.orderSuccessTimer=setTimeout(()=>{const confirmation=$("confirmation");confirmation.classList.add("hidden");confirmation.classList.remove("order-success-overlay");window.orderSuccessTimer=null;window.scrollTo({top:0,behavior:"smooth"})},3000);await loadCustomerOrders();if(paymentIntent)setTimeout(()=>{window.location.href=paymentIntent},450)}catch(e){notify("Order could not be placed: "+e.message,"error")}finally{btn.disabled=false;btn.textContent="Place my order →"}}
+
+function goAddFoodMenu(orderId){location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)+"&addToOrder=1&targetOrder="+encodeURIComponent(orderId)}
+function openCustomerOrders(){location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)+"&orders=1"}
+async function loadCustomerOrders(){
+ const box=$("customerOrdersList");if(!box||!tableId)return;const savedWindowY=window.scrollY,savedListY=box.scrollTop,savedOrderScroll=box.querySelector(".order-items-grid")?.scrollTop||0;
+ const {data:orders,error}=await db.from("orders").select("id,order_code,customer_name,status,total,created_at,accepted_at,edit_count,edit_paused_at,edit_seconds_remaining").eq("restaurant_id",restaurantId).eq("table_id",tableId).not("status","in","(served,cancelled)").order("created_at",{ascending:false});
+ if(error){box.innerHTML='<p class="muted">Orders could not load: '+esc(error.message)+'</p>';return}
+ $("customerOrdersCount").textContent=orders&&orders.length?"("+orders.length+")":"";$("customerOrdersBtn").classList.toggle("hidden",!orders||orders.length===0);
+ if(!orders||!orders.length){const emptySignature="empty:"+JSON.stringify(orders||[]);if(window.__customerOrdersSignature!==emptySignature){window.__customerOrdersSignature=emptySignature;box.innerHTML='<div class="order"><strong>No active orders yet</strong><p class="muted">Place an order and it will appear here.</p></div>'}return}
+ const {data:items,error:itemError}=await db.from("order_items").select("id,order_id,menu_item_id,item_name,quantity,unit_price").in("order_id",orders.map(o=>o.id));
+ if(itemError){box.innerHTML='<p class="muted">Order items could not load: '+esc(itemError.message)+'</p>';return}
+ const summaryPairs=await Promise.all(orders.map(async o=>{const {data,error}=await db.rpc("get_table_order_edit_summary",{p_order_id:o.id,p_table_id:tableId});return [o.id,(!error&&data)?data:{requests_used:0,requests_remaining:3,last_status:"none"}]}));const editSummaryByOrder=Object.fromEntries(summaryPairs);orders.forEach(o=>{const r=editSummaryByOrder[o.id]||{};customerEditStatus[o.id]=r.last_status||"none";customerApprovalUntil[o.id]=r.approved_until?new Date(r.approved_until).getTime():0;customerRequestUsage[o.id]=Number(r.requests_used||0);customerApprovalStaff[o.id]={title:r.staff_title||"",name:r.staff_name||""}});const customerSignature=JSON.stringify({orders,items,editSummaryByOrder});if(window.__customerOrdersSignature===customerSignature){updateCustomerTimers(orders);return}window.__customerOrdersSignature=customerSignature;
+ const toolbar='<div class="orders-toolbar"><div><div class="eyebrow">Live order tracking</div><p class="muted" style="margin:5px 0 0">Table '+esc(tableNumber)+' · Your food status updates live</p></div></div>';
+ box.innerHTML=toolbar+orders.map((o,index)=>{
+  const accepted=o.accepted_at?new Date(o.accepted_at).getTime():null;
+  const status=customerEditStatus[o.id]||"none";
+  const editSummary=editSummaryByOrder[o.id]||{};const staffName=String(editSummary.staff_name||"").trim();const staffTitle=String(editSummary.staff_title||"").trim();const staffLabel=staffName?(staffTitle?staffTitle+" ":"")+staffName:"";const requestsUsed=Number(customerRequestUsage[o.id]||0);const activeApproval=status==="approved"&&customerApprovalUntil[o.id]>Date.now();
+  let editUntil=accepted?accepted+120000:0;
+  if(status==="approved"){editUntil=customerApprovalUntil[o.id]||editUntil}
+  const remaining=o.edit_paused_at!=null?Math.max(0,Number(o.edit_seconds_remaining||0)*1000):Math.max(0,editUntil-Date.now());
+  const editCount=Number(o.edit_count||0);
+  const editing=!!customerEditing[o.id]&&(status!=="pending");
+  const rows=(items||[]).filter(i=>i.order_id===o.id);
+  const draft=customerDrafts[o.id];
+  const draftRows=editing?Object.values(draft||{}):rows.map(i=>({id:i.menu_item_id,name:i.item_name,quantity:i.quantity,price:i.unit_price}));
+  return '<article class="order" data-order-card="'+o.id+'" style="padding:22px;border-radius:20px;animation-delay:'+Math.min(index*60,300)+'ms"><div class="section-head" style="margin-top:0"><div><div class="eyebrow">Order #'+esc(o.order_code||shortCode(o.id))+'</div><h2 style="font-size:22px;margin:5px 0">Table '+esc(tableNumber)+'</h2><span class="order-status-chip status-'+esc(String(o.status||"new").toLowerCase())+'">'+esc(({new:"Waiting for staff",accepted:"Accepted",preparing:"Preparing",ready:"Ready",served:"Served",cancelled:"Cancelled"})[String(o.status||"new").toLowerCase()]||o.status)+'</span>'+(status==="approved"&&staffLabel?'<small class="muted" style="display:block;margin-top:7px">Edit request accepted by '+esc(staffLabel)+'</small>':'')+'</div><strong data-order-total style="font-size:22px">'+money(editing?draftRows.reduce((s,i)=>s+i.price*i.quantity,0):o.total)+'</strong></div>'+
+  '<div class="order-items-grid">'+draftRows.map(i=>{const imgItem=menuItems.find(m=>m.id===(i.id||i.menu_item_id));const src=imgItem?imageFor(imgItem):"";return '<div class="order-item" data-line="'+(i.id||i.menu_item_id)+'">'+(src?'<div class="order-item-photo"><img loading="eager" decoding="async" src="'+esc(src)+'" alt="'+esc(i.name||i.item_name)+'" onerror="imageFallback(this)"></div>':'<div class="order-item-photo" aria-hidden="true"></div>')+'<div class="order-item-info"><strong>'+esc(i.name||i.item_name)+' × '+i.quantity+'</strong><span class="muted">'+money(i.price||i.unit_price)+' each</span></div><span class="order-item-price" data-line-total>'+money((i.price||i.unit_price)*i.quantity)+'</span>'+(editing?'<div class="qty"><button aria-label="Decrease quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',-1)">−</button><strong data-quantity>'+i.quantity+'</strong><button aria-label="Increase quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',1)">+</button></div>':'')+'</div>'}).join("")+'</div>'+
+  (editing?'<div class="edit-order-actions" style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px"><button class="liquid-btn" style="width:100%" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button><button class="primary" style="width:100%;min-height:50px" data-confirm-edit="'+o.id+'" onclick="confirmOrderEdit(this.dataset.confirmEdit)"><span>Place updated order →</span></button><button class="liquid-btn" style="width:100%" onclick="cancelCustomerEdit(\''+o.id+'\')"><span>Cancel editing</span></button></div>':'')+
+  '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px">'+(accepted?'<span class="timer-chip '+(remaining===0?'expired':'')+'" id="timer-'+o.id+'">'+(remaining?'⏱ '+String(Math.floor(remaining/60000)).padStart(2,'0')+':'+String(Math.floor(remaining/1000)%60).padStart(2,'0'):'⏱ Edit window ended')+'</span>':'<span class="timer-chip">Waiting for staff to accept</span>')+
+  (editing?'': '<button class="liquid-btn" '+(!accepted||status==="pending"||(remaining===0&&!activeApproval&&requestsUsed>=3)?'disabled':'')+' onclick="askToEditOrder(\''+o.id+'\','+remaining+')"><span>'+'✦ Edit order'+'</span></button>')+'</div></article>';
+ }).join("");
+ updateCustomerTimers(orders);requestAnimationFrame(()=>{if(!document.body.classList.contains("orders-page")&&!document.body.classList.contains("checkout-page"))return;window.scrollTo({top:savedWindowY,behavior:"instant"});const currentBox=$("customerOrdersList");if(currentBox){currentBox.scrollTop=savedListY;const list=currentBox.querySelector(".order-items-grid");if(list)list.scrollTop=savedOrderScroll}});
+}
+
+function updateCustomerTimers(orders){if(orderTimer)clearInterval(orderTimer);const tick=()=>{(orders||[]).forEach(o=>{const el=$("timer-"+o.id);if(!el)return;let ms;if(o.edit_paused_at!=null)ms=Math.max(0,Number(o.edit_seconds_remaining||0)*1000);else{let until=o.accepted_at?new Date(o.accepted_at).getTime()+120000:0;if(customerEditStatus[o.id]==="approved"&&customerApprovalUntil[o.id])until=customerApprovalUntil[o.id];ms=Math.max(0,until-Date.now())}el.classList.toggle("expired",ms===0);el.textContent=o.edit_paused_at!=null?'⏸ Paused · '+String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0'):ms>0?'⏱ '+String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0'):'⏱ Edit window ended';});};tick();orderTimer=setInterval(tick,1000)}
+async function beginCustomerEdit(orderId){
+ const {data:order,error:orderError}=await db.from("orders").select("accepted_at,edit_count,status,edit_paused_at,edit_seconds_remaining").eq("id",orderId).eq("table_id",tableId).maybeSingle();
+ if(orderError||!order){notify("Could not open edit mode. Please refresh and try again.","error");return}
+ const acceptedUntil=order.accepted_at?new Date(order.accepted_at).getTime()+120000:0;
+ const approvedUntil=Number(customerApprovalUntil[orderId]||0);
+ const alreadyPaused=order.edit_paused_at!=null;
+ const allowed=alreadyPaused?(Number(order.edit_seconds_remaining||0)>0||(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())):((customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())||Date.now()<=acceptedUntil);
+ if(!allowed){notify("The 2-minute edit window has ended. Request staff approval to edit.","error");await loadCustomerOrders();return}
+ const {error:pauseError}=await db.rpc("pause_table_order_edit",{p_order_id:orderId,p_table_id:tableId});
+ if(pauseError){notify("Could not pause edit timer: "+pauseError.message,"error");return}
+ const {data:items,error:itemError}=await db.from("order_items").select("menu_item_id,item_name,quantity,unit_price").eq("order_id",orderId);
+ if(itemError){await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});notify("Could not load order items: "+itemError.message,"error");return}
+ const draft={};
+ (items||[]).forEach(i=>{if(i.menu_item_id)draft[i.menu_item_id]={id:i.menu_item_id,name:i.item_name,quantity:Number(i.quantity)||1,price:Number(i.unit_price)||0}});
+ if(!Object.keys(draft).length){await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});notify("No editable items were found in this order.","error");return}
+ customerDrafts[orderId]=draft;customerEditing[orderId]=true;
+ notify(Number(customerApprovalUntil[orderId]||0)>Date.now()?"Staff-approved 2-minute window keeps running while you edit.":"Initial edit timer paused. Make changes, then place the updated order to resume the remaining time.");
+ await loadCustomerOrders();
+}
+async function cancelCustomerEdit(orderId){
+ const {error}=await db.rpc("resume_table_order_edit",{p_order_id:orderId,p_table_id:tableId});
+ if(error){notify("Could not resume edit timer: "+error.message,"error");return}
+ delete customerDrafts[orderId];delete customerEditing[orderId];
+ notify("Editing cancelled. The remaining timer has resumed.");
+ await loadCustomerOrders();
+}
+async function askToEditOrder(id,remaining){
+ if(customerEditing[id])return;
+ if(Number(remaining)>0||(customerEditStatus[id]==="approved"&&Number(customerApprovalUntil[id]||0)>Date.now())){
+   await beginCustomerEdit(id);return;
+ }
+ if(customerEditStatus[id]==="pending"){notify("Edit request is already waiting for staff approval.");return}
+ if(Number(customerRequestUsage[id]||0)>=3){notify("You have used all 3 staff edit requests for this order.","error");return}
+ const {data,error}=await db.rpc("request_table_order_edit",{p_order_id:id,p_table_id:tableId});
+ if(error){notify("Could not request edit: "+error.message,"error");return}
+ if(data?.requests_used!=null)customerRequestUsage[id]=Number(data.requests_used);
+ if(data?.status==="limit_reached"){notify("You have used all 3 staff edit requests for this order.","error");await loadCustomerOrders();return}
+ if(data?.status==="within_window"||data?.status==="approved"){
+   if(data.approved_until)customerApprovalUntil[id]=new Date(data.approved_until).getTime();else if(data.edit_until)customerApprovalUntil[id]=new Date(data.edit_until).getTime();
+   if(data.status==="approved")customerEditStatus[id]="approved";
+   await beginCustomerEdit(id);return;
+ }
+ customerEditStatus[id]="pending";
+ notify("Edit request sent to staff. You can edit after staff allows it.");
+ await loadCustomerOrders();
+}
+function draftOrderQty(orderId,menuId,delta){const draft=customerDrafts[orderId];if(!draft||!draft[menuId])return;const next=draft[menuId].quantity+delta;if(next>50)return;if(next<=0)delete draft[menuId];else draft[menuId].quantity=next;const card=document.querySelector(`[data-order-card="${orderId}"]`);if(card){const row=card.querySelector(`[data-line="${menuId}"]`);if(row){if(!draft[menuId])row.remove();else{const q=row.querySelector("[data-quantity]");if(q)q.textContent=String(draft[menuId].quantity);const line=row.querySelector("[data-line-total]");if(line)line.textContent=money(draft[menuId].price*draft[menuId].quantity)}}const total=Object.values(draft).reduce((s,i)=>s+i.price*i.quantity,0);const totalEl=card.querySelector("[data-order-total]");if(totalEl)totalEl.textContent=money(total);const confirm=card.querySelector("[data-confirm-edit]");if(confirm)confirm.disabled=!Object.values(draft).some(i=>i.quantity>0)}if(!Object.values(draft).length)notify("Order must contain at least one item.","error")}
+function draftAddItem(orderId){const sel=$("add-item-"+orderId);if(!sel)return;const item=menuItems.find(m=>m.id===sel.value);if(!item)return;const draft=customerDrafts[orderId]||(customerDrafts[orderId]={});if(!draft[item.id])draft[item.id]={id:item.id,name:item.name,quantity:0,price:Number(item.price)};if(draft[item.id].quantity>=50)return notify("Maximum quantity is 50.","error");draft[item.id].quantity++;const card=document.querySelector(`[data-order-card="${orderId}"]`);const row=card?.querySelector(`[data-line="${item.id}"]`);if(row){const q=row.querySelector("[data-quantity]");if(q)q.textContent=String(draft[item.id].quantity);const line=row.querySelector("[data-line-total]");if(line)line.textContent=money(draft[item.id].price*draft[item.id].quantity);const totalEl=card.querySelector("[data-order-total]");if(totalEl)totalEl.textContent=money(Object.values(draft).reduce((s,i)=>s+i.price*i.quantity,0))}else loadCustomerOrders()}
+async function confirmOrderEdit(orderId,confirmed=false){
+ if(!confirmed){pendingModalAction=()=>confirmOrderEdit(orderId,true);showModal("Place updated order?","Save these quantity changes to the existing order and send the updated items and total to the staff dashboard?","Place updated order");return}
+ const draft=customerDrafts[orderId]||{};
+ const changes=Object.values(draft).filter(i=>i.quantity>0).map(i=>({id:i.id,quantity:i.quantity}));
+ if(!changes.length){notify("Your updated order must contain at least one item.","error");return}
+ const {data:meta,error:metaError}=await db.from("orders").select("edit_count,accepted_at,status,edit_paused_at,edit_seconds_remaining").eq("id",orderId).eq("table_id",tableId).maybeSingle();
+ if(metaError||!meta){notify("Could not verify this order. Refresh the page and try again.","error");return}
+ const approvedUntil=Number(customerApprovalUntil[orderId]||0);
+ const acceptedUntil=meta.accepted_at?new Date(meta.accepted_at).getTime()+120000:0;
+ if(!(meta.edit_paused_at!=null)&&!(customerEditStatus[orderId]==="approved"&&approvedUntil>Date.now())&&acceptedUntil<Date.now()){notify("The edit window has expired. Request staff approval again.","error");delete customerEditing[orderId];await loadCustomerOrders();return}
+ const buttons=[...document.querySelectorAll('[data-confirm-edit="'+orderId+'"]')];buttons.forEach(b=>{b.disabled=true;b.dataset.originalText=b.textContent;b.textContent="Placing updated order…"});
+ try{
+  const {error}=await db.rpc("apply_table_order_edit",{p_order_id:orderId,p_table_id:tableId,p_changes:changes});
+  if(error)throw error;
+  delete customerDrafts[orderId];delete customerEditing[orderId];delete customerApprovalUntil[orderId];
+  notify("Updated order placed. Staff dashboard will refresh automatically.");
+  await loadCustomerOrders();
+ }catch(error){notify("Updated order was not saved: "+(error?.message||"Please try again."),"error")}
+ finally{buttons.forEach(b=>{b.disabled=false;b.textContent="Place updated order →"})}
+}
+function backToMenu(){location.href=location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(tableId)}
+
+function subscribeCustomerOrders(){
+ if(customerOrderChannel)db.removeChannel(customerOrderChannel);if(editPollTimer)clearInterval(editPollTimer);editPollTimer=setInterval(()=>{if(ordersPage)loadCustomerOrders()},30000);
+ let customerRefreshQueued=false;const refreshCustomerOrders=()=>{if(customerRefreshQueued)return;customerRefreshQueued=true;setTimeout(()=>{customerRefreshQueued=false;if(ordersPage||!$("customerOrdersPanel").classList.contains("hidden"))loadCustomerOrders()},350)};
+ syncPollTimer=setInterval(()=>{if(document.hidden||staffMode||!tableId||syncPollBusy)return;const panel=$("customerOrdersPanel");if((ordersPage||(panel&&!panel.classList.contains("hidden")))&&!Object.values(customerEditing).some(Boolean)){syncPollBusy=true;loadCustomerOrders().finally(()=>{syncPollBusy=false})}},1000);
+ customerOrderChannel=db.channel("customer-orders-"+tableId)
+ .on("postgres_changes",{event:"*",schema:"public",table:"orders",filter:"table_id=eq."+tableId},refreshCustomerOrders)
+ .on("postgres_changes",{event:"*",schema:"public",table:"order_items"},refreshCustomerOrders)
+ .on("postgres_changes",{event:"*",schema:"public",table:"order_edit_requests"},refreshCustomerOrders)
+ .subscribe();
+}
+
+function newOrder(){if(window.orderSuccessTimer){clearTimeout(window.orderSuccessTimer);window.orderSuccessTimer=null}$("confirmation").classList.add("hidden");$("confirmation").classList.remove("order-success-overlay");$("customerName").value="";$("customerPhone").value="";window.scrollTo({top:0,behavior:"smooth"})}
+/* Staff dashboard */
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const {error}=await db.auth.signInWithPassword({email:$("staffEmail").value.trim(),password:$("staffPassword").value});if(error){notify("Login failed: "+error.message,"error");return}await checkSession()});
+async function checkSession(){const {data, error:sessionError}=await db.auth.getSession();if(sessionError){notify("Session could not be restored yet. Please retry in a moment.","error");return}if(!data.session){$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");return}let member=null,error=null;for(let attempt=0;attempt<3;attempt++){const result=await db.from("staff_members").select("role,is_active").eq("user_id",data.session.user.id).eq("restaurant_id",restaurantId).maybeSingle();member=result.data;error=result.error;if(!error)break;await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)))}if(error){notify("Could not verify staff access due to a temporary connection issue. Your session is kept; tap retry or refresh again.","error");return}if(!member||member.is_active===false||!["waiter","kitchen"].includes(member.role)){await db.auth.signOut();$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");notify("This account does not have staff access. Please use the correct login page.","error");return}$("loginPanel").classList.add("hidden");await loadMenu();if(tablesPage){$("dashboard").classList.add("hidden");$("tablesPage").classList.remove("hidden");renderTableLinks()}else{$("tablesPage").classList.add("hidden");$("dashboard").classList.remove("hidden");await loadOrders();subscribeOrders()}}
+const TABLE_LINK_IDS=[
+["01","22222222-2222-4222-8222-222222222222"],["02","33333333-3333-4333-8333-333333333333"],
+["03","96c054ec-ad33-4816-9ca6-0969199a1ca3"],["04","972b0889-e660-4b1d-9008-92a57bd0baa2"],
+["05","c0a1c6a5-4029-48be-a1ff-0374714e3d70"],["06","a52c8bdf-5992-4fbc-9428-f2b4264ef9e3"],
+["07","84163bab-ac3e-433f-b58d-abce7d899ab0"],["08","314cb8d9-414d-4eff-84eb-529ad129fbd7"],
+["09","5cb67441-58a7-4b9c-9e35-9a2c44cbe5aa"],["10","cb225fcb-e27b-4a39-9738-e93f93aaf4d5"]];
+function tableOrderUrl(id){return location.origin+location.pathname+"?restaurant="+encodeURIComponent(restaurantId)+"&table="+encodeURIComponent(id)}
+function openTablesPage(){location.href=location.pathname+"?staff=1&tables=1"}
+function backToKitchen(){location.href=location.pathname+"?staff=1"}
+function renderTableLinks(){
+ const el=$("tableLinks"); if(!el)return;
+ el.innerHTML=TABLE_LINK_IDS.map(([num,id])=>{const url=tableOrderUrl(id);return '<article class="order"><strong>Table '+Number(num)+'</strong><p class="muted" style="overflow-wrap:anywhere">'+esc(url)+'</p><div class="order-actions"><button class="primary" onclick="copyTableLink(\''+id+'\')">Copy link</button><button class="secondary" onclick="window.open(\''+esc(url)+'\',\'_blank\')">Open</button></div></article>'}).join("");
+}
+async function copyTableLink(id){const url=tableOrderUrl(id);try{await navigator.clipboard.writeText(url);notify("Table order link copied.")}catch(e){window.prompt("Copy this table order link:",url)}}
+async function copyAllTableLinks(){const all=TABLE_LINK_IDS.map(([num,id])=>"Table "+Number(num)+": "+tableOrderUrl(id)).join("\\n");try{await navigator.clipboard.writeText(all);notify("All 10 table links copied.")}catch(e){window.prompt("Copy all table links:",all)}}
+const staffServeDelays={};
+function itemNeedsPreparation(orderItem){
+ const name=String(orderItem.item_name||"").toLowerCase();
+ const menu=menuItems.find(m=>String(m.name||"").toLowerCase()===name);
+ const category=String(menu?.category||"").toLowerCase();
+ const readyKeywords=/\b(water|mineral water|bottled water|soda|soft drink|coke|coca cola|pepsi|sprite|fanta|thums up|7up|packaged juice|juice box|canned drink|energy drink|bottled drink)\b/;
+ if(readyKeywords.test(name))return false;
+ if(/\b(water|soft drinks|packaged drinks|bottled drinks)\b/.test(category))return false;
+ return true;
+}
+async function loadOrders(){
+ const {data:orders,error}=await db.from("orders").select("id,order_code,table_id,customer_name,customer_phone,status,total,created_at,accepted_at,edit_count,payment_method,payment_status").eq("restaurant_id",restaurantId).order("created_at",{ascending:false}).limit(100);
+ if(error){$("orders").textContent="Orders could not load.";notify(error.message,"error");return}
+ const active=(orders||[]).filter(o=>!["served","cancelled"].includes(String(o.status||"").toLowerCase()));active.forEach(o=>{staffAcceptTimes[o.id]=o.accepted_at?new Date(o.accepted_at).getTime():0});
+ if(!active.length){const emptySig=JSON.stringify({active:[],tables:[],items:[]});if(window.__staffOrderSignature!==emptySig){window.__staffOrderSignature=emptySig;$("orders").textContent="No active orders. New orders will appear here live."}updateServeLocks();await loadEditRequests();return}
+ const {data:tables}=await db.from("restaurant_tables").select("id,table_number").eq("restaurant_id",restaurantId);
+ const {data:items,error:itemError}=active.length?await db.from("order_items").select("order_id,item_name,quantity,unit_price").in("order_id",active.map(o=>o.id)):{data:[],error:null};
+ if(itemError){notify(itemError.message,"error");return}
+ const staffOrderSignature=JSON.stringify({active,tables,items});if(window.__staffOrderSignature===staffOrderSignature){updateServeLocks();await loadEditRequests();return}window.__staffOrderSignature=staffOrderSignature;
+ active.forEach(o=>{const orderItems=(items||[]).filter(i=>i.order_id===o.id);staffServeDelays[o.id]=orderItems.some(itemNeedsPreparation)});
+ const staffSavedScrollY=window.scrollY;const staffSavedListY=$("orders").scrollTop;
+ $("orders").innerHTML='<div class="staff-order-grid">'+active.map(o=>{
+ const t=(tables||[]).find(x=>x.id===o.table_id);const accepted=!!o.accepted_at||String(o.status).toLowerCase()==="accepted";
+ return '<article class="order"><div class="section-head" style="margin-top:0"><div><div class="eyebrow">Order #'+esc(o.order_code||shortCode(o.id))+'</div><h2 style="font-size:23px">Table '+esc(t?String(t.table_number).replace(/^0+/,"")||"1":"?")+'</h2></div><span class="muted">'+esc(new Date(o.created_at).toLocaleTimeString())+'</span></div><p><strong>'+esc(o.customer_name)+'</strong> · '+esc(o.customer_phone||"No phone")+'</p><div class="payment-order-chip"><b>Payment: '+esc(({cash:"Cash",upi:"UPI",qr:"QR"}[o.payment_method]||"Cash"))+'</b><span>'+esc(({pending:"Pending confirmation",cash_due:"Cash due",paid:"Paid",failed:"Failed"}[o.payment_status]||"Pending"))+'</span></div>'+
+ '<div class="order-items-grid">'+(items||[]).filter(i=>i.order_id===o.id).map(i=>{const mi=menuItems.find(m=>m.name===i.item_name);const src=mi?imageFor(mi):"";return '<div class="order-item">'+(src?'<div class="order-item-photo"><img loading="eager" decoding="async" src="'+esc(src)+'" alt="'+esc(i.item_name)+'" onerror="imageFallback(this)"></div>':'<div class="order-item-photo" aria-hidden="true"></div>')+'<div class="order-item-info"><strong>'+esc(i.item_name)+' × '+i.quantity+'</strong><span class="muted">'+money(i.unit_price)+' each</span></div><span class="order-item-price">'+money(i.unit_price*i.quantity)+'</span></div>'}).join("")+'</div>'+
+ '<div class="total-row"><span>Total</span><span>'+money(o.total)+'</span></div><div class="order-actions" style="justify-content:space-between;align-items:center"><button class="accept-btn" '+(accepted?'disabled':'')+' onclick="acceptOrder(\''+o.id+'\')">'+(accepted?'✓ Accepted':'Accept order')+'</button><button class="secondary" onclick="setOrderStatus(\''+o.id+'\',\'preparing\')">Preparing</button><button class="secondary" onclick="setOrderStatus(\''+o.id+'\',\'ready\')">Ready</button><button class="served-btn" onclick="markServed(\''+o.id+'\')">Served 👍🏻</button></div></article>';
+ }).join("")+'</div>';
+ updateServeLocks();
+ requestAnimationFrame(()=>{window.scrollTo({top:staffSavedScrollY,behavior:"instant"});const list=$("orders");if(list)list.scrollTop=staffSavedListY});
+ await loadEditRequests();
+}
+function updateServeLocks(){document.querySelectorAll(".served-btn").forEach(btn=>{const action=btn.getAttribute("onclick")||"";const marker="markServed('";const pos=action.indexOf(marker);if(pos<0)return;const idStart=pos+marker.length;const idEnd=action.indexOf("'",idStart);const orderId=action.slice(idStart,idEnd);const acceptedAt=staffAcceptTimes[orderId]||0;if(!acceptedAt){btn.disabled=true;btn.textContent="Complete order";return}const delay=(staffServeDelays[orderId]===false)?0:300000;const ms=acceptedAt+delay-Date.now();if(ms<=0){btn.disabled=false;btn.textContent="Served 👍🏻";return}btn.disabled=true;btn.textContent="Complete order"})}
+setInterval(()=>{if(staffMode&&$("dashboard")&&!$("dashboard").classList.contains("hidden"))updateServeLocks()},1000);let staffMissingMembershipCount=0;let staffMembershipWatch=setInterval(async()=>{if(!staffMode)return;const {data}=await db.auth.getSession();if(!data.session)return;const {data:member,error:membershipError}=await db.from("staff_members").select("user_id,role,is_active").eq("user_id",data.session.user.id).eq("restaurant_id",restaurantId).maybeSingle();if(membershipError)return;if(!member||member.is_active===false||!["waiter","kitchen"].includes(member.role)){staffMissingMembershipCount++;if(staffMissingMembershipCount<3)return;await db.auth.signOut();location.href=location.pathname+"?staff=1";return}staffMissingMembershipCount=0},1000);
+async function acceptOrder(id,confirmed=false){if(!confirmed){pendingModalAction=()=>acceptOrder(id,true);showModal("Accept this order?","Accept this order and send it to the kitchen.","Accept order");return}const {error}=await db.rpc("accept_table_order",{p_order_id:id});if(error){notify("Could not accept order: "+error.message,"error");return}notify("Order accepted.");await loadOrders()}
+async function setOrderStatus(id,status,confirmed=false){if(!confirmed){pendingModalAction=()=>setOrderStatus(id,status,true);showModal("Confirm order status","Change this order status to "+status+"?","Save status");return}const {error}=await db.from("orders").update({status}).eq("id",id).eq("restaurant_id",restaurantId);if(error){notify("Could not update status: "+error.message,"error");return}notify("Order status changed to "+status+".");await loadOrders()}
+
+
+async function loadEditRequests(){
+ const el=$("editRequests");if(!el)return;
+ const {data:reqs,error}=await db.from("order_edit_requests").select("id,order_id,table_id,restaurant_id,requested_at,status").eq("restaurant_id",restaurantId).eq("status","pending").order("requested_at",{ascending:true});
+ if(error){el.innerHTML='<div class="notice error">Edit requests: '+esc(error.message)+'</div>';return}
+ if(!reqs||!reqs.length){if(window.__staffEditRequestSignature!=="empty")el.innerHTML="";window.__staffEditRequestSignature="empty";return}
+ const ids=[...new Set(reqs.map(r=>r.order_id))];
+ const {data:orders}=await db.from("orders").select("id,table_id,customer_name,order_code,total").in("id",ids);
+ const {data:tables}=await db.from("restaurant_tables").select("id,table_number").eq("restaurant_id",restaurantId);
+ const requestSignature=JSON.stringify({reqs,orders,tables});if(window.__staffEditRequestSignature===requestSignature)return;window.__staffEditRequestSignature=requestSignature;
+ el.innerHTML='<div class="panel"><div class="eyebrow">Needs attention</div><h2>Customer edit requests</h2>'+reqs.map(r=>{const o=(orders||[]).find(x=>x.id===r.order_id);const t=(tables||[]).find(x=>x.id===r.table_id);return '<article class="order"><strong>Table '+esc(t?String(t.table_number).replace(/^0+/,"")||"1":"?")+' · Order #'+esc(o?(o.order_code||shortCode(o.id)):"")+'</strong><p class="muted">'+esc(o?.customer_name||"Customer")+' wants to edit this order.</p><div class="order-actions"><button class="accept-btn" onclick="respondEditRequest(\''+r.id+'\',true)">Allow edit</button><button class="secondary" onclick="respondEditRequest(\''+r.id+'\',false)">Deny</button></div></article>'}).join("")+'</div>';
+}
+async function respondEditRequest(id,allow,confirmed=false){
+ if(!confirmed){pendingModalAction=()=>respondEditRequest(id,allow,true);showModal(allow?"Allow customer to edit?":"Deny customer edit?","Confirm this decision for the customer’s order edit request.",allow?"Allow edit":"Deny request");return}
+ const {error}=await db.rpc("respond_table_order_edit",{p_request_id:id,p_allow:allow});
+ if(error){notify("Could not respond: "+error.message,"error");return}
+ notify(allow?"Customer edit allowed.":"Customer edit denied.");await loadEditRequests();await loadOrders();
+}
+
+async function updateStatus(id){const status=$("status-"+id).value;const {error}=await db.from("orders").update({status}).eq("id",id).eq("restaurant_id",restaurantId);if(error){notify("Status update failed: "+error.message,"error");return}notify("Order status updated.");await loadOrders()}
+function markServed(id){const acceptedAt=staffAcceptTimes[id]||0;const delay=(staffServeDelays[id]===false)?0:300000;if(!acceptedAt||Date.now()<acceptedAt+delay){notify(!acceptedAt?"Accept this order first.":"Prepared dishes unlock Served 5 minutes after acceptance.","error");return}pendingModalAction=async()=>{const {error}=await db.from("orders").update({status:"served"}).eq("id",id).eq("restaurant_id",restaurantId);if(error){notify("Could not mark order served: "+error.message,"error");return}notify("Order marked served and removed from the active list.");await loadOrders()};showModal("Mark this order as served?","After confirmation, this order will disappear from the active customer and kitchen order lists. The order record will remain in Supabase.","Mark served")}
+function showModal(title,message,buttonText){$("modalTitle").textContent=title;$("modalMessage").textContent=message;$("modalConfirmBtn").textContent=buttonText;$("appModal").classList.remove("hidden")}
+function closeModal(){$("appModal").classList.add("hidden");pendingModalAction=null}
+$("appModal").addEventListener("click",e=>{if(e.target===$("appModal"))closeModal()});
+async function confirmModalAction(){const action=pendingModalAction;closeModal();if(action)await action()}
+function subscribeOrders(){if(channel)db.removeChannel(channel);if(editPollTimer)clearInterval(editPollTimer);let queued=false;const refresh=()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;loadOrders()},350)};channel=db.channel("orders-"+restaurantId).on("postgres_changes",{event:"*",schema:"public",table:"orders",filter:"restaurant_id=eq."+restaurantId},refresh).on("postgres_changes",{event:"*",schema:"public",table:"order_items"},refresh).on("postgres_changes",{event:"*",schema:"public",table:"order_edit_requests",filter:"restaurant_id=eq."+restaurantId},refresh).subscribe();editPollTimer=setInterval(async()=>{if(syncPollBusy||document.hidden||!staffMode||$("dashboard").classList.contains("hidden"))return;syncPollBusy=true;try{await Promise.all([loadOrders(),loadEditRequests()])}finally{syncPollBusy=false}},1000)}
+async function logout(confirmed=false){if(!confirmed){pendingModalAction=()=>logout(true);showModal("Confirm logout","Are you sure you want to sign out of the staff dashboard?","Log out");return}if(channel){await db.removeChannel(channel);channel=null}await db.auth.signOut();$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden")}
+document.addEventListener("contextmenu",e=>{if(!e.target.closest("input,textarea,[contenteditable=true]"))e.preventDefault()});document.addEventListener("selectstart",e=>{if(!e.target.closest("input,textarea,[contenteditable=true]"))e.preventDefault()});document.addEventListener("copy",e=>{if(!e.target.closest("input,textarea,[contenteditable=true]"))e.preventDefault()});document.addEventListener("cut",e=>{if(!e.target.closest("input,textarea,[contenteditable=true]"))e.preventDefault()});document.addEventListener("dragstart",e=>{if(e.target.tagName==="IMG")e.preventDefault()});
+
+ document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(["+","=","-","0"].includes(e.key)))e.preventDefault()});document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
+// Prevent browser pull-to-refresh at the top edge without disabling normal page scrolling.
+let pullStartY=0;document.addEventListener("touchstart",e=>{if(e.touches&&e.touches.length===1)pullStartY=e.touches[0].clientY},{passive:true});document.addEventListener("touchmove",e=>{if(!e.touches||e.touches.length!==1)return;const dy=e.touches[0].clientY-pullStartY;if(dy>0&&window.scrollY<=0){const target=e.target instanceof Element?e.target:null;const scroller=target?.closest("[data-allow-pull-scroll],.modal-body,.cart-items,.order-items");if(!scroller)e.preventDefault()}},{passive:false});init();
+</script></body></html>
