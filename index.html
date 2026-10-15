@@ -618,6 +618,40 @@ body:not(.checkout-page) *{touch-action:pan-y}
  .checkout-page .checkout-action-row .checkout-submit,.checkout-page .checkout-action-row .checkout-upi-action{min-height:36px!important;padding:7px 6px!important;font-size:10px!important}
 }
 
+
+/* Final visual adjustment: move both cart cards upward and keep summary content inside its box. */
+.checkout-page .checkout-heading{margin-top:8px!important;margin-bottom:8px!important}
+.checkout-page .checkout-layout{position:relative!important;top:-38px!important;min-width:0!important}
+.checkout-page .checkout-items-wrap,.checkout-page .checkout-summary{min-width:0!important;box-sizing:border-box!important}
+.checkout-page .checkout-summary{zoom:.76!important;width:100%!important;max-width:100%!important;padding:clamp(12px,1.2vw,18px)!important;overflow:visible!important}
+.checkout-page .checkout-summary .checkout-section-title{font-size:clamp(14px,1vw,16px)!important;margin-bottom:8px!important}
+.checkout-page .checkout-summary .summary-line{font-size:clamp(12px,.95vw,14px)!important;line-height:1.35!important;padding:5px 0!important}
+.checkout-page .checkout-summary .summary-line strong,.checkout-page .checkout-summary .included{font-size:inherit!important}
+.checkout-page .checkout-summary .total-row{font-size:clamp(15px,1.15vw,18px)!important;padding:10px 0 12px!important}
+.checkout-page .checkout-summary .field{margin:8px 0!important;min-width:0!important}
+.checkout-page .checkout-summary .field label{font-size:10px!important}
+.checkout-page .checkout-summary .field input{width:100%!important;min-width:0!important;box-sizing:border-box!important;min-height:36px!important;padding:8px 10px!important;font-size:13px!important}
+.checkout-page .checkout-summary .payment-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+.checkout-page .checkout-summary .payment-choice{min-width:0!important;box-sizing:border-box!important;padding:7px 5px!important;font-size:10px!important;white-space:normal!important}
+.checkout-page .checkout-summary .payment-choice span{overflow-wrap:anywhere!important}
+.checkout-page .checkout-summary .payment-detail{box-sizing:border-box!important;width:100%!important;min-width:0!important;overflow:visible!important;padding:8px!important;font-size:11px!important}
+.checkout-page .checkout-summary .payment-detail img{display:block!important;width:min(112px,100%)!important;max-width:100%!important;max-height:112px!important;height:auto!important;object-fit:contain!important;margin:7px auto!important}
+.checkout-page .checkout-action-row{display:flex!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important;width:100%!important;min-width:0!important}
+.checkout-page .checkout-action-row .checkout-submit,.checkout-page .checkout-action-row .checkout-upi-action{flex:1 1 0!important;width:auto!important;min-width:0!important;box-sizing:border-box!important;min-height:38px!important;padding:7px 6px!important;font-size:11px!important;line-height:1.25!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.checkout-page .checkout-action-row .checkout-submit span{font-size:14px!important}
+.checkout-page .checkout-summary .checkout-trust{font-size:10px!important;line-height:1.4!important}
+@media(max-width:760px){
+ .checkout-page .checkout-heading{margin-top:8px!important;margin-bottom:8px!important}
+ .checkout-page .checkout-layout{top:-38px!important;gap:8px!important}
+ .checkout-page .checkout-summary{zoom:.8!important;width:100%!important;padding:12px!important}
+ .checkout-page .checkout-summary .checkout-section-title{font-size:14px!important}
+ .checkout-page .checkout-summary .summary-line{font-size:12px!important}
+ .checkout-page .checkout-summary .total-row{font-size:15px!important}
+ .checkout-page .checkout-summary .payment-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .checkout-page .checkout-summary .payment-choice{font-size:9px!important;padding:7px 3px!important}
+ .checkout-page .checkout-action-row .checkout-submit,.checkout-page .checkout-action-row .checkout-upi-action{font-size:10px!important;min-height:36px!important}
+}
+
 </style>
 </head>
 <body>
