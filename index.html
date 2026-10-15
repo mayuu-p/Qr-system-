@@ -405,6 +405,24 @@ button,input,select,textarea{font:inherit}
  .checkout-page .add-more-btn{margin-top:5px!important;padding:6px!important}
 }
 
+
+/* Final customer/staff scroll consistency: natural page scroll outside the checkout */
+html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+body{overscroll-behavior-y:contain}
+#staffView,#staffView #dashboard,#staffView #tablesPage{min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important}
+#staffView{overflow:visible!important;overscroll-behavior:initial!important}
+#staffView #orders{height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:initial!important}
+#staffView .panel,#staffView .order,#staffView #editRequests{overflow:visible!important}
+#staffView .staff-order-grid{overflow:visible!important}
+#staffView #tableLinks{overflow:visible!important}
+#staffView .order-actions{flex-wrap:wrap!important}
+@media(max-width:760px){
+ body:not(.checkout-page){overflow-x:hidden!important;overflow-y:auto!important}
+ body:not(.checkout-page) #staffView{padding-bottom:24px!important}
+ body:not(.checkout-page) #staffView .panel{margin-bottom:12px!important}
+ body:not(.checkout-page) #staffView .staff-order-grid{gap:10px!important}
+}
+
 </style>
 </head>
 <body>
