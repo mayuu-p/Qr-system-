@@ -746,6 +746,52 @@ body:not(.checkout-page) *{touch-action:pan-y}
  .checkout-page .checkout-action-row .checkout-submit,.checkout-page .checkout-action-row .checkout-upi-action{font-size:10px!important;min-height:38px!important}
 }
 
+
+/* Cart visual match to the approved reference: elevated summary and scan-friendly QR. */
+.checkout-page .checkout-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.55fr) minmax(360px,.95fr)!important;
+  gap:clamp(16px,1.6vw,26px)!important;
+  align-items:start!important;
+  top:-10px!important;
+}
+.checkout-page .checkout-items-wrap{
+  min-width:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  padding:clamp(18px,1.7vw,28px)!important;
+}
+.checkout-page .checkout-summary{
+  position:relative!important;
+  top:-38px!important;
+  min-width:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+  padding:clamp(16px,1.4vw,24px)!important;
+  overflow:visible!important;
+}
+.checkout-page .checkout-summary .checkout-section-title{font-size:clamp(17px,1.25vw,21px)!important}
+.checkout-page .checkout-summary .summary-line{font-size:clamp(14px,1vw,17px)!important;line-height:1.4!important;padding:7px 0!important}
+.checkout-page .checkout-summary .total-row{font-size:clamp(19px,1.35vw,24px)!important;padding:12px 0 14px!important}
+.checkout-page .checkout-summary .field label{font-size:clamp(11px,.8vw,13px)!important}
+.checkout-page .checkout-summary .field input{font-size:clamp(14px,1vw,16px)!important;min-height:42px!important}
+.checkout-page .checkout-summary .payment-choice{font-size:clamp(11px,.85vw,14px)!important;padding:10px 7px!important;min-height:42px!important}
+.checkout-page .checkout-summary .payment-detail{padding:12px!important;font-size:12px!important;overflow:visible!important}
+.checkout-page .checkout-summary .payment-detail img{width:min(148px,100%)!important;max-width:100%!important;max-height:148px!important;height:auto!important;object-fit:contain!important;margin:9px auto!important}
+.checkout-page .checkout-action-row .checkout-submit,.checkout-page .checkout-action-row .checkout-upi-action{min-height:46px!important;font-size:clamp(12px,.9vw,15px)!important;padding:10px 8px!important}
+@media(max-width:760px){
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;top:0!important;gap:12px!important}
+ .checkout-page .checkout-items-wrap{width:100%!important;max-height:none!important}
+ .checkout-page .checkout-summary{top:0!important;width:100%!important;max-height:none!important;padding:14px!important}
+ .checkout-page .checkout-summary .payment-detail img{width:min(138px,100%)!important;max-height:138px!important}
+}
+@media(min-width:761px) and (max-width:1100px){
+ .checkout-page .checkout-layout{grid-template-columns:minmax(0,1.2fr) minmax(320px,.9fr)!important}
+ .checkout-page .checkout-summary{top:-24px!important}
+}
+
 </style>
 </head>
 <body>
