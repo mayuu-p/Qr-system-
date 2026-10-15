@@ -457,19 +457,21 @@ body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overf
 }
 
 
-/* Cart layout: keep the summary stationary; only the item rows are scrollable. */
-.checkout-page{height:100dvh!important;overflow:hidden!important}
-.checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
-.checkout-page #cartPanel{height:100%!important;min-height:0!important;overflow:hidden!important}
-.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr)!important;gap:16px!important;height:0!important;min-height:0!important;flex:1 1 auto!important;overflow:hidden!important;align-items:stretch!important}
+/* Cart visibility and scrolling: preserve the full panel height; only item rows scroll. */
+.checkout-page{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.checkout-page #customerView{height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel{display:flex!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;flex-direction:column!important}
+.checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr)!important;gap:16px!important;height:auto!important;min-height:0!important;flex:1 1 0%!important;overflow:hidden!important;align-items:stretch!important}
 .checkout-page .checkout-items-wrap{height:100%!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
-.checkout-page #cartRows{flex:1 1 auto!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+.checkout-page #cartRows{display:block!important;flex:1 1 0%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
 .checkout-page .add-more-btn{flex:0 0 auto!important;margin-top:12px!important}
-.checkout-page .checkout-summary{position:relative!important;top:auto!important;align-self:stretch!important;height:100%!important;max-height:none!important;min-height:0!important;overflow:hidden!important;overscroll-behavior:initial!important}
+.checkout-page .checkout-summary{position:relative!important;top:auto!important;align-self:stretch!important;height:auto!important;max-height:100%!important;min-height:0!important;overflow:hidden!important;overscroll-behavior:initial!important}
 @media(max-width:760px){
  .checkout-page main{height:calc(100dvh - 66px)!important;padding:6px 8px!important}
- .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:10px!important;overflow:hidden!important}
- .checkout-page .checkout-items-wrap{flex:1 1 45%!important;height:auto!important;min-height:0!important}
+ .checkout-page #cartPanel{padding:10px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:10px!important;height:auto!important;min-height:0!important;flex:1 1 0%!important;overflow:hidden!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;height:auto!important;min-height:0!important}
  .checkout-page #cartRows{min-height:0!important;height:0!important}
  .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:hidden!important}
 }
