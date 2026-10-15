@@ -396,7 +396,7 @@ async function loadOrders(){
  const {data:orders,error}=await db.from("orders").select("id,order_code,table_id,customer_name,customer_phone,status,total,created_at,accepted_at,edit_count").eq("restaurant_id",restaurantId).order("created_at",{ascending:false}).limit(100);
  if(error){$("orders").textContent="Orders could not load.";notify(error.message,"error");return}
  const active=(orders||[]).filter(o=>!["served","cancelled"].includes(String(o.status||"").toLowerCase()));active.forEach(o=>{staffAcceptTimes[o.id]=o.accepted_at?new Date(o.accepted_at).getTime():0});
- if(!active.length){$("orders").textContent="No active orders. New orders will appear here live.";await loadEditRequests();return}
+ if(!active.length){const emptySig=JSON.stringify({active:[],tables:[],items:[]});if(window.__staffOrderSignature!==emptySig){window.__staffOrderSignature=emptySig;$("orders").textContent="No active orders. New orders will appear here live."}updateServeLocks();await loadEditRequests();return}
  const {data:tables}=await db.from("restaurant_tables").select("id,table_number").eq("restaurant_id",restaurantId);
  const {data:items,error:itemError}=active.length?await db.from("order_items").select("order_id,item_name,quantity,unit_price").in("order_id",active.map(o=>o.id)):{data:[],error:null};
  if(itemError){notify(itemError.message,"error");return}
@@ -423,10 +423,11 @@ async function loadEditRequests(){
  const el=$("editRequests");if(!el)return;
  const {data:reqs,error}=await db.from("order_edit_requests").select("id,order_id,table_id,restaurant_id,requested_at,status").eq("restaurant_id",restaurantId).eq("status","pending").order("requested_at",{ascending:true});
  if(error){el.innerHTML='<div class="notice error">Edit requests: '+esc(error.message)+'</div>';return}
- if(!reqs||!reqs.length){el.innerHTML="";return}
+ if(!reqs||!reqs.length){if(window.__staffEditRequestSignature!=="empty")el.innerHTML="";window.__staffEditRequestSignature="empty";return}
  const ids=[...new Set(reqs.map(r=>r.order_id))];
  const {data:orders}=await db.from("orders").select("id,table_id,customer_name,order_code,total").in("id",ids);
  const {data:tables}=await db.from("restaurant_tables").select("id,table_number").eq("restaurant_id",restaurantId);
+ const requestSignature=JSON.stringify({reqs,orders,tables});if(window.__staffEditRequestSignature===requestSignature)return;window.__staffEditRequestSignature=requestSignature;
  el.innerHTML='<div class="panel"><div class="eyebrow">Needs attention</div><h2>Customer edit requests</h2>'+reqs.map(r=>{const o=(orders||[]).find(x=>x.id===r.order_id);const t=(tables||[]).find(x=>x.id===r.table_id);return '<article class="order"><strong>Table '+esc(t?String(t.table_number).replace(/^0+/,"")||"1":"?")+' · Order #'+esc(o?(o.order_code||shortCode(o.id)):"")+'</strong><p class="muted">'+esc(o?.customer_name||"Customer")+' wants to edit this order.</p><div class="order-actions"><button class="accept-btn" onclick="respondEditRequest(\''+r.id+'\',true)">Allow edit</button><button class="secondary" onclick="respondEditRequest(\''+r.id+'\',false)">Deny</button></div></article>'}).join("")+'</div>';
 }
 async function respondEditRequest(id,allow,confirmed=false){
