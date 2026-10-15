@@ -128,6 +128,27 @@ body{height:auto!important;min-height:100dvh!important;overflow-x:hidden!importa
  .modal-card{width:100%!important;max-height:calc(100dvh - 24px)!important}
 }
 
+
+/* Stable owner shell: keep top header and management sidebar anchored while workspace scrolls. */
+html,body{height:100%!important;min-height:100%!important;overflow:hidden!important}
+#app{height:100dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.top{position:sticky!important;top:0!important;z-index:100!important;flex:0 0 auto!important}
+.layout{display:grid!important;grid-template-columns:235px minmax(0,1fr)!important;flex:1 1 auto!important;height:calc(100dvh - 76px)!important;min-height:0!important;max-height:none!important;overflow:hidden!important;align-items:stretch!important}
+.layout>aside{position:sticky!important;top:0!important;align-self:stretch!important;height:100%!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+.layout>.main{height:100%!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;scrollbar-gutter:stable!important}
+.page{height:auto!important;min-height:100%!important;max-height:none!important;overflow:visible!important}
+.table-wrap{max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+@media(max-width:700px){
+ html,body{height:100%!important;overflow:hidden!important}
+ #app{height:100dvh!important;overflow:hidden!important}
+ .top{min-height:64px!important}
+ .layout{display:block!important;height:calc(100dvh - 64px)!important;min-height:0!important;overflow:hidden!important}
+ .layout>aside{display:none!important}
+ .layout>.main{height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 10px calc(24px + env(safe-area-inset-bottom))!important}
+ .page{height:auto!important;min-height:0!important;overflow:visible!important}
+ .modal:not(.hidden){display:flex!important;align-items:center!important;justify-content:center!important}
+}
+
 </style>
 </head>
 <body>
