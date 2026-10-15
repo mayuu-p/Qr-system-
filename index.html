@@ -364,6 +364,7 @@ async function loadOrders(){
  const {data:items,error:itemError}=await db.from("order_items").select("order_id,item_name,quantity,unit_price").in("order_id",active.map(o=>o.id));
  if(itemError){notify(itemError.message,"error");return}
  active.forEach(o=>{const orderItems=(items||[]).filter(i=>i.order_id===o.id);staffServeDelays[o.id]=orderItems.some(itemNeedsPreparation)});
+ const staffSavedScrollY=window.scrollY;const staffSavedListY=$("orders").scrollTop;
  $("orders").innerHTML='<div class="staff-order-grid">'+active.map(o=>{
  const t=(tables||[]).find(x=>x.id===o.table_id);const accepted=!!o.accepted_at||String(o.status).toLowerCase()==="accepted";
  return '<article class="order"><div class="section-head" style="margin-top:0"><div><div class="eyebrow">Order #'+esc(o.order_code||shortCode(o.id))+'</div><h2 style="font-size:23px">Table '+esc(t?String(t.table_number).replace(/^0+/,"")||"1":"?")+'</h2></div><span class="muted">'+esc(new Date(o.created_at).toLocaleTimeString())+'</span></div><p><strong>'+esc(o.customer_name)+'</strong> · '+esc(o.customer_phone||"No phone")+'</p>'+
@@ -371,6 +372,7 @@ async function loadOrders(){
  '<div class="total-row"><span>Total</span><span>'+money(o.total)+'</span></div><div class="order-actions" style="justify-content:space-between;align-items:center"><button class="accept-btn" '+(accepted?'disabled':'')+' onclick="acceptOrder(\''+o.id+'\')">'+(accepted?'✓ Accepted':'Accept order')+'</button><button class="secondary" onclick="setOrderStatus(\''+o.id+'\',\'preparing\')">Preparing</button><button class="secondary" onclick="setOrderStatus(\''+o.id+'\',\'ready\')">Ready</button><button class="served-btn" onclick="markServed(\''+o.id+'\')">Served 👍🏻</button></div></article>';
  }).join("")+'</div>';
  updateServeLocks();
+ requestAnimationFrame(()=>{window.scrollTo({top:staffSavedScrollY,behavior:"instant"});const list=$("orders");if(list)list.scrollTop=staffSavedListY});
  await loadEditRequests();
 }
 function updateServeLocks(){document.querySelectorAll(".served-btn").forEach(btn=>{const action=btn.getAttribute("onclick")||"";const marker="markServed('";const pos=action.indexOf(marker);if(pos<0)return;const idStart=pos+marker.length;const idEnd=action.indexOf("'",idStart);const orderId=action.slice(idStart,idEnd);const acceptedAt=staffAcceptTimes[orderId]||0;if(!acceptedAt){btn.disabled=true;btn.textContent="🔒 Accept first";return}const delay=(staffServeDelays[orderId]===false)?0:300000;const ms=acceptedAt+delay-Date.now();if(ms<=0){btn.disabled=false;btn.textContent="Served 👍🏻";return}btn.disabled=true;const total=Math.ceil(ms/1000);btn.textContent="🔒 Serve in "+String(Math.floor(total/60)).padStart(2,"0")+":"+String(total%60).padStart(2,"0")})}
