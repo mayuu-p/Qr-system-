@@ -358,6 +358,53 @@ button,input,select,textarea{font:inherit}
 .orders-page .orders-toolbar p.muted{display:none!important}
 #staffView .timer-chip{display:none!important}
 
+
+/* Checkout layout: fixed summary, only cart item list scrolls */
+.checkout-page .checkout-panel{display:flex!important;flex-direction:column!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-layout{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow:hidden!important;align-items:stretch!important}
+.checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+.checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important}
+.checkout-page #cartRows{flex:1 1 0%!important;height:0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scroll-behavior:smooth!important;scrollbar-gutter:stable!important}
+.checkout-page .add-more-btn{flex:0 0 auto!important;position:relative!important;bottom:auto!important;width:100%!important;margin-top:8px!important}
+.checkout-page .checkout-summary{position:static!important;align-self:stretch!important;min-height:0!important;height:100%!important;max-height:100%!important;overflow:hidden!important;overscroll-behavior:none!important;display:flex!important;flex-direction:column!important}
+.checkout-page .checkout-summary>.checkout-section-title,
+.checkout-page .checkout-summary>.summary-line,
+.checkout-page .checkout-summary>.summary-divider,
+.checkout-page .checkout-summary>.total-row,
+.checkout-page .checkout-summary>.field,
+.checkout-page .checkout-summary>#checkoutPayment,
+.checkout-page .checkout-summary>.checkout-submit,
+.checkout-page .checkout-summary>.checkout-trust{flex-shrink:0!important}
+.checkout-page .checkout-summary #checkoutPayment{min-height:0!important;overflow:hidden!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail{max-height:clamp(90px,30vh,300px)!important;overflow:hidden!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(150px,100%)!important;max-height:clamp(70px,18vh,170px)!important;object-fit:contain!important}
+@media(min-width:761px){
+ .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
+ .checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(300px,.8fr)!important;gap:clamp(10px,1.2vw,18px)!important}
+ .checkout-page .checkout-items-wrap,.checkout-page .checkout-summary{padding:clamp(10px,1.2vw,20px)!important}
+ .checkout-page .checkout-summary{position:static!important}
+}
+@media(max-width:760px){
+ .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;padding:5px!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:6px!important}
+ .checkout-page .checkout-items-wrap{flex:1 1 0%!important;min-height:0!important}
+ .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;padding:6px 8px!important}
+ .checkout-page .checkout-summary .checkout-section-title{margin-bottom:2px!important}
+ .checkout-page .checkout-summary .summary-line{padding:2px 0!important}
+ .checkout-page .checkout-summary .total-row{padding:3px 0 4px!important}
+ .checkout-page .checkout-summary .field{margin:3px 0!important}
+ .checkout-page .checkout-summary .field input{min-height:27px!important;padding:4px 7px!important}
+ .checkout-page .checkout-summary .checkout-payment{padding:4px!important;margin:3px 0!important}
+ .checkout-page .checkout-summary .payment-detail{margin-top:3px!important;padding:3px!important}
+ .checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(70px,100%)!important;max-height:70px!important;margin:2px auto!important}
+ .checkout-page .checkout-summary .payment-detail small{font-size:8px!important;line-height:1.15!important}
+ .checkout-page .checkout-summary .payment-detail .pay-amount{font-size:12px!important}
+ .checkout-page .checkout-summary .payment-choice{min-height:28px!important;padding:3px!important;font-size:8px!important}
+ .checkout-page .checkout-summary .checkout-submit{min-height:30px!important;padding:5px 7px!important}
+ .checkout-page .checkout-summary .checkout-trust{font-size:7px!important;margin-top:2px!important}
+ .checkout-page .add-more-btn{margin-top:5px!important;padding:6px!important}
+}
+
 </style>
 </head>
 <body>
