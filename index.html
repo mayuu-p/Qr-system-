@@ -245,7 +245,6 @@ function updateCustomerTimers(orders){if(orderTimer)clearInterval(orderTimer);co
 async function beginCustomerEdit(orderId){
  const {data:order,error:orderError}=await db.from("orders").select("accepted_at,edit_count,status,edit_paused_at,edit_seconds_remaining").eq("id",orderId).eq("table_id",tableId).maybeSingle();
  if(orderError||!order){notify("Could not open edit mode. Please refresh and try again.","error");return}
- if(Number(order.edit_count||0)>=3){notify("This order has reached the 3-edit limit.","error");await loadCustomerOrders();return}
  const acceptedUntil=order.accepted_at?new Date(order.accepted_at).getTime()+120000:0;
  const approvedUntil=Number(customerApprovalUntil[orderId]||0);
  const alreadyPaused=order.edit_paused_at!=null;
