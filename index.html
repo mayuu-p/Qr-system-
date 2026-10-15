@@ -476,6 +476,22 @@ body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overf
  .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:hidden!important}
 }
 
+
+/* Cart recovery: guarantee the checkout panel is visible and has a real layout height. */
+.checkout-page #customerView{display:block!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.checkout-page #cartPanel{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;flex-direction:column!important;width:100%!important;max-width:1600px!important;height:100%!important;min-height:0!important;flex:1 1 auto!important;margin:0 auto!important}
+.checkout-page main{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important}
+.checkout-page .checkout-top,.checkout-page .checkout-heading{flex-shrink:0!important}
+.checkout-page .checkout-layout{width:100%!important;min-width:0!important;min-height:0!important;flex:1 1 0%!important;height:auto!important}
+.checkout-page .checkout-items-wrap{min-width:0!important}
+.checkout-page .checkout-summary{min-width:0!important}
+.checkout-page #cartRows{min-height:0!important}
+.checkout-page #cartPanel.hidden{display:flex!important}
+@media(max-width:760px){
+ .checkout-page #cartPanel{height:100%!important;min-height:0!important}
+ .checkout-page .checkout-layout{min-height:0!important;flex:1 1 0%!important}
+}
+
 </style>
 </head>
 <body>
