@@ -149,6 +149,24 @@ html,body{height:100%!important;min-height:100%!important;overflow:hidden!import
  .modal:not(.hidden){display:flex!important;align-items:center!important;justify-content:center!important}
 }
 
+
+/* Owner workspace scrolling: header/sidebar stay anchored; each section uses the main scroller. */
+html,body{height:100%!important;overflow:hidden!important}
+#app{height:100dvh!important;overflow:hidden!important}
+.top{position:relative!important;top:0!important;flex:0 0 auto!important;z-index:100!important}
+.layout{height:calc(100dvh - 76px)!important;min-height:0!important;overflow:hidden!important}
+.layout>aside{height:100%!important;max-height:100%!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+.layout>.main{height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+.layout>.main .page{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+#page-overview,#page-menu,#page-orders,#page-tables,#page-staff,#page-settings{height:auto!important;min-height:0!important;overflow:visible!important}
+#page-staff .panel,#page-settings .panel,#page-overview .panel,#page-menu .panel{max-height:none!important;overflow:visible!important}
+#page-staff form,#page-settings form{max-height:none!important;overflow:visible!important}
+@media(max-width:700px){
+ .layout{height:calc(100dvh - 64px)!important;min-height:0!important}
+ .layout>.main{height:100%!important;overflow-y:auto!important;padding-bottom:24px!important}
+ .layout>.main .page{overflow:visible!important}
+}
+
 </style>
 </head>
 <body>
