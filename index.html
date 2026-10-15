@@ -1030,6 +1030,36 @@ body:not(.checkout-page) *{touch-action:pan-y}
   .checkout-page .checkout-layout{gap:0!important;margin-top:0!important;padding-top:0!important}
   .checkout-page .checkout-summary{top:0!important;margin-top:0!important}
 }
+
+/* Strict zero-gap rule: checkout heading directly touches the order summary top edge. */
+.checkout-page .checkout-heading{
+  margin:0!important;
+  padding:0!important;
+}
+.checkout-page .checkout-layout{
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  row-gap:0!important;
+  column-gap:0!important;
+  align-items:start!important;
+}
+.checkout-page .checkout-summary{
+  position:relative!important;
+  top:0!important;
+  margin:0!important;
+  transform:none!important;
+  align-self:start!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+@media(max-width:760px){
+  .checkout-page .checkout-heading{margin:0!important;padding:0!important}
+  .checkout-page .checkout-layout{margin:0!important;padding:0!important;gap:0!important;row-gap:0!important}
+  .checkout-page .checkout-summary{top:0!important;margin:0!important}
+}
 </style>
 </head>
 <body>
