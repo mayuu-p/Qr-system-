@@ -1130,6 +1130,68 @@ body:not(.checkout-page) *{touch-action:pan-y}
     max-width:100%!important;
   }
 }
+
+/* Actual cart selector (the body has no .checkout-page class): summary starts at cart panel top. */
+@media(min-width:761px){
+  #cartPanel.checkout-panel{
+    position:relative!important;
+    overflow:visible!important;
+  }
+  #cartPanel .checkout-summary{
+    position:absolute!important;
+    top:0!important;
+    right:clamp(16px,3vw,30px)!important;
+    left:auto!important;
+    width:calc((100% - clamp(16px,3vw,30px)*2 - clamp(14px,1.5vw,24px))*0.38)!important;
+    max-width:none!important;
+    margin:0!important;
+    transform:none!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    z-index:5!important;
+  }
+  #cartPanel .checkout-layout{
+    display:block!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+  #cartPanel .checkout-items-wrap{
+    width:62%!important;
+    max-width:62%!important;
+    margin-top:178px!important;
+    overflow:visible!important;
+    max-height:none!important;
+  }
+  #cartPanel .checkout-heading{
+    width:62%!important;
+    margin:0 0 12px!important;
+    padding:0!important;
+  }
+}
+@media(max-width:760px){
+  #cartPanel .checkout-summary{
+    position:relative!important;
+    top:0!important;
+    right:auto!important;
+    left:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+  #cartPanel .checkout-layout{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  #cartPanel .checkout-heading{width:100%!important;margin:0 0 12px!important}
+  #cartPanel .checkout-items-wrap{width:100%!important;max-width:100%!important;margin-top:0!important}
+}
 </style>
 </head>
 <body>
