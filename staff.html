@@ -555,6 +555,39 @@ body:not(.checkout-page) #staffView,body:not(.checkout-page) #staffView *{oversc
  .checkout-page .checkout-summary{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:10px!important}
 }
 
+
+/* Unified final checkout sizing and two-way touch scrolling. */
+html,body{overscroll-behavior-y:auto!important}
+body:not(.checkout-page){height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;touch-action:pan-y!important}
+body:not(.checkout-page) #staffView,body:not(.checkout-page) #dashboard,body:not(.checkout-page) #tablesPage,body:not(.checkout-page) #orders{height:auto!important;max-height:none!important;overflow:visible!important}
+body:not(.checkout-page) #staffView .panel,body:not(.checkout-page) #staffView .order,body:not(.checkout-page) #staffView #editRequests{max-height:none!important;overflow:visible!important}
+body:not(.checkout-page) *{touch-action:pan-y}
+.checkout-page .checkout-summary{zoom:.6!important;width:166.6667%!important;max-width:none!important;box-sizing:border-box!important;position:relative!important;top:auto!important;align-self:start!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;transform:none!important}
+.checkout-page .checkout-layout{grid-template-columns:minmax(0,1.8fr) minmax(330px,1fr)!important;align-items:start!important;overflow:visible!important}
+.checkout-page .checkout-summary .field{margin:7px 0!important}
+.checkout-page .checkout-summary .summary-line{padding:6px 0!important}
+.checkout-page .checkout-summary .total-row{padding:10px 0!important}
+.checkout-page .checkout-summary .checkout-submit{min-height:44px!important}
+.checkout-page .checkout-summary .checkout-trust{margin-top:7px!important}
+.checkout-page .checkout-summary .payment-detail{padding:8px!important}
+.checkout-page #cartRows{-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important}
+@media(max-width:760px){
+ body.checkout-page,html:has(body.checkout-page){height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important}
+ body.checkout-page{height:auto!important;min-height:100dvh!important;overflow:visible!important;touch-action:pan-y!important}
+ .checkout-page header{position:sticky!important;top:0!important}
+ .checkout-page main{display:block!important;width:100%!important;height:auto!important;min-height:0!important;max-width:none!important;overflow:visible!important;padding:8px!important}
+ .checkout-page #customerView{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}
+ .checkout-page #cartPanel,.checkout-page #cartPanel.hidden{display:flex!important;position:relative!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;padding:12px!important;margin:0!important}
+ .checkout-page .checkout-top,.checkout-page .checkout-heading{flex:0 0 auto!important}
+ .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:12px!important;height:auto!important;min-height:0!important;max-height:none!important;flex:none!important;overflow:visible!important}
+ .checkout-page .checkout-items-wrap{display:flex!important;flex-direction:column!important;flex:none!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:12px!important}
+ .checkout-page #cartRows{display:block!important;flex:none!important;height:auto!important;min-height:0!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+ .checkout-page .checkout-summary{display:block!important;flex:none!important;position:relative!important;width:166.6667%!important;zoom:.6!important;height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;padding:14px!important;margin-bottom:0!important}
+ .checkout-page .checkout-summary .field{margin:8px 0!important}
+ .checkout-page .checkout-summary .payment-detail{overflow:visible!important}
+ .checkout-page .checkout-summary img{max-height:110px!important;width:auto!important}
+}
+
 </style>
 </head>
 <body>
