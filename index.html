@@ -393,15 +393,14 @@ function itemNeedsPreparation(orderItem){
  return true;
 }
 async function loadOrders(){
- $("orders").classList.add("is-refreshing");
  const {data:orders,error}=await db.from("orders").select("id,order_code,table_id,customer_name,customer_phone,status,total,created_at,accepted_at,edit_count").eq("restaurant_id",restaurantId).order("created_at",{ascending:false}).limit(100);
  if(error){$("orders").textContent="Orders could not load.";notify(error.message,"error");return}
- $("orders").classList.remove("is-refreshing");
  const active=(orders||[]).filter(o=>!["served","cancelled"].includes(String(o.status||"").toLowerCase()));active.forEach(o=>{staffAcceptTimes[o.id]=o.accepted_at?new Date(o.accepted_at).getTime():0});
  if(!active.length){$("orders").textContent="No active orders. New orders will appear here live.";await loadEditRequests();return}
  const {data:tables}=await db.from("restaurant_tables").select("id,table_number").eq("restaurant_id",restaurantId);
- const {data:items,error:itemError}=await db.from("order_items").select("order_id,item_name,quantity,unit_price").in("order_id",active.map(o=>o.id));
+ const {data:items,error:itemError}=active.length?await db.from("order_items").select("order_id,item_name,quantity,unit_price").in("order_id",active.map(o=>o.id)):{data:[],error:null};
  if(itemError){notify(itemError.message,"error");return}
+ const staffOrderSignature=JSON.stringify({active,tables,items});if(window.__staffOrderSignature===staffOrderSignature){updateServeLocks();await loadEditRequests();return}window.__staffOrderSignature=staffOrderSignature;
  active.forEach(o=>{const orderItems=(items||[]).filter(i=>i.order_id===o.id);staffServeDelays[o.id]=orderItems.some(itemNeedsPreparation)});
  const staffSavedScrollY=window.scrollY;const staffSavedListY=$("orders").scrollTop;
  $("orders").innerHTML='<div class="staff-order-grid">'+active.map(o=>{
