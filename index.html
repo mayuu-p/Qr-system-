@@ -286,11 +286,83 @@ button,input,select,textarea{font:inherit}
  #staffView .order h2{font-size:19px!important}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.checkout-page #cartRows{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Final compact layout + reliable nested cart scrolling */
+@media(min-width:761px){
+  .checkout-page main{height:calc(100dvh - 78px)!important;padding:7px 10px!important}
+  .checkout-page .checkout-panel{padding:clamp(10px,1.15vw,17px)!important}
+  .checkout-page .checkout-heading{margin:7px 0!important}
+  .checkout-page .checkout-heading h2{font-size:clamp(25px,2.4vw,32px)!important}
+  .checkout-page .checkout-heading p{font-size:12px!important}
+  .checkout-page .checkout-layout{grid-template-columns:minmax(0,1.55fr) minmax(290px,.8fr)!important;gap:12px!important}
+  .checkout-page .checkout-items-wrap,.checkout-page .checkout-summary{padding:clamp(10px,1.1vw,16px)!important;border-radius:16px!important}
+  .checkout-page .cart-row{padding:10px 0!important}
+  .checkout-page .cart-row>div:first-child strong{font-size:13px!important}
+  .checkout-page .qty{gap:6px!important}
+  .checkout-page .qty button{width:29px!important;height:29px!important}
+  #staffView{zoom:.92}
+}
+@media(max-width:760px){
+  .checkout-page{height:100dvh!important;overflow:hidden!important}
+  .checkout-page header{padding:10px 12px!important}
+  .checkout-page .top{gap:7px!important}
+  .checkout-page .brand{font-size:17px!important}
+  .checkout-page .tag{font-size:10px!important;margin-top:2px!important}
+  .checkout-page .table-pill{padding:7px 9px!important;font-size:10px!important}
+  .checkout-page main{height:calc(100dvh - 70px)!important;min-height:0!important;padding:5px!important;overflow:hidden!important}
+  .checkout-page .checkout-panel{height:100%!important;min-height:0!important;padding:8px!important;border-radius:14px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+  .checkout-page .checkout-top{padding-bottom:6px!important;gap:6px!important}
+  .checkout-page .back-to-menu{padding:7px 9px!important;font-size:11px!important}
+  .checkout-page .checkout-step{font-size:7px!important;letter-spacing:.6px!important}
+  .checkout-page .checkout-heading{margin:6px 0!important;gap:5px!important;align-items:center!important}
+  .checkout-page .checkout-heading h2{font-size:clamp(21px,5.5vw,26px)!important;line-height:1.05!important;margin:3px 0!important}
+  .checkout-page .checkout-heading p{font-size:9px!important;line-height:1.2!important}
+  .checkout-page .checkout-table-pill{padding:6px 8px!important;font-size:9px!important}
+  .checkout-page .checkout-layout{display:flex!important;flex-direction:column!important;gap:6px!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+  .checkout-page .checkout-items-wrap{display:flex!important;flex:1 1 0%!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:0!important;padding:7px 9px!important;overflow:hidden!important}
+  .checkout-page .checkout-items-wrap>.checkout-section-title{flex:0 0 auto!important;margin-bottom:3px!important;font-size:11px!important}
+  .checkout-page #cartRows{display:block!important;flex:1 1 0%!important;height:0!important;min-height:0!important;width:100%!important;overflow-y:auto!important;overflow-x:hidden!important;padding:0 7px 0 0!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scrollbar-gutter:stable!important}
+  .checkout-page #cartRows .cart-row{min-height:48px!important;padding:7px 0!important;gap:7px!important}
+  .checkout-page #cartRows .cart-row>div:first-child strong{font-size:11px!important;line-height:1.2!important}
+  .checkout-page #cartRows .cart-row .muted{font-size:10px!important}
+  .checkout-page .checkout-page .qty{gap:4px!important}
+  .checkout-page .qty{gap:5px!important;padding:2px!important}
+  .checkout-page .qty button{width:25px!important;height:25px!important;border-radius:7px!important}
+  .checkout-page .checkout-summary{position:static!important;display:block!important;flex:0 1 43%!important;width:100%!important;max-height:43%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:7px 9px!important}
+  .checkout-page .checkout-summary .checkout-section-title{font-size:11px!important;margin-bottom:3px!important}
+  .checkout-page .checkout-summary .summary-line{padding:3px 0!important;font-size:10px!important}
+  .checkout-page .checkout-summary .summary-line strong{font-size:11px!important}
+  .checkout-page .checkout-summary .total-row{font-size:13px!important;padding:5px 0 6px!important}
+  .checkout-page .checkout-summary .field{margin:4px 0!important}
+  .checkout-page .checkout-summary .field label{font-size:8px!important;margin-bottom:3px!important}
+  .checkout-page .checkout-summary .field input{min-height:31px!important;padding:6px 8px!important;font-size:12px!important}
+  .checkout-page .checkout-payment{padding:6px!important;margin:4px 0!important}
+  .checkout-page .checkout-payment .checkout-section-title{font-size:10px!important}
+  .checkout-page .payment-choice-grid{gap:3px!important}
+  .checkout-page .payment-choice{min-height:32px!important;padding:4px 3px!important;font-size:8px!important;gap:3px!important}
+  .checkout-page .payment-detail{margin-top:4px!important;padding:5px!important}
+  .checkout-page .payment-detail img{width:min(90px,100%)!important;margin:3px auto!important}
+  .checkout-page .payment-detail .pay-amount{font-size:14px!important}
+  .checkout-page .checkout-submit{min-height:34px!important;padding:6px 8px!important;font-size:11px!important}
+  .checkout-page .checkout-trust{font-size:8px!important;margin-top:3px!important}
+  .checkout-page .add-more-btn{padding:6px!important;margin-top:4px!important;font-size:10px!important}
+  #staffView{padding:6px!important}
+  #staffView .order{padding:10px!important}
+  #staffView .section-head{margin:8px 0!important}
+  #staffView .order h2{font-size:18px!important}
+  #staffView .muted{font-size:11px!important}
+  #staffView .order-actions{gap:6px!important}
+  #staffView .order-actions button{padding:8px 9px!important;font-size:11px!important}
+}
+.orders-page .timer-chip{display:none!important}
+.orders-page .orders-toolbar p.muted{display:none!important}
+#staffView .timer-chip{display:none!important}
+
 </style>
 </head>
 <body>
 <header><div class="top"><div><div class="brand">THYME <span>&</span> WHISK.</div><div class="tag">Good food. Good mood.</div></div><div style="display:flex;align-items:center;gap:8px"><button id="customerRefreshBtn" class="secondary" onclick="window.location.reload()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">↻ Refresh</button><button id="customerOrdersBtn" class="secondary hidden" onclick="openCustomerOrders()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">Orders <span id="customerOrdersCount"></span></button><div class="table-pill" id="tableLabel">Finding your table...</div></div></div></header>
-<main><div id="notice" class="notice hidden"></div><div id="appModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><div class="confirm-icon" style="margin:0 0 16px">?</div><h2 id="modalTitle" style="font-size:25px">Confirm action</h2><p id="modalMessage" class="muted" style="line-height:1.6"></p><div class="order-actions" style="justify-content:flex-end"><button class="secondary" onclick="closeModal()">Cancel</button><button id="modalConfirmBtn" class="primary" onclick="confirmModalAction()">Confirm</button></div></div></div><section id="customerView"><section id="customerOrdersPanel" class="panel hidden"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><div><div class="eyebrow">Your table</div><h2>Active orders</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="liquid-btn" onclick="backToMenu()"><span>← Back to menu</span></button></div></div><p class="muted">After staff accepts, you can edit any number of times during the first 2 minutes. The timer pauses only while you edit in this initial window. After that, request staff approval (maximum 3 requests per order); each approval gives a running 2-minute edit window.</p><div id="customerOrdersList"></div></section>
+<main><div id="notice" class="notice hidden"></div><div id="appModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><div class="confirm-icon" style="margin:0 0 16px">?</div><h2 id="modalTitle" style="font-size:25px">Confirm action</h2><p id="modalMessage" class="muted" style="line-height:1.6"></p><div class="order-actions" style="justify-content:flex-end"><button class="secondary" onclick="closeModal()">Cancel</button><button id="modalConfirmBtn" class="primary" onclick="confirmModalAction()">Confirm</button></div></div></div><section id="customerView"><section id="customerOrdersPanel" class="panel hidden"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><div><div class="eyebrow">Your table</div><h2>Active orders</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="liquid-btn" onclick="backToMenu()"><span>← Back to menu</span></button></div></div><div id="customerOrdersList"></div></section>
 <div class="hero"><div class="hero-copy"><div class="eyebrow">Made fresh, served with love</div><h1>A little taste of happiness.</h1><p>Explore our menu, choose your favourites and order right from your table.</p></div><img src="coldcoffee.jpg" alt="" onerror="this.style.display='none'"></div>
 <div class="section-head"><div><div class="eyebrow">Our kitchen</div><h2>Find your favourite</h2></div><span id="menuCount" class="muted"></span></div><div id="categories" class="categories"></div><div id="menu" class="grid">Loading fresh menu...</div>
 <section id="cartPanel" class="panel hidden checkout-panel"><div class="checkout-top"><button class="back-to-menu" onclick="closeCart()">← Back to menu</button><div class="checkout-step">SECURE TABLE ORDER</div></div><div class="checkout-heading"><div><div class="eyebrow">YOUR SELECTION</div><h2>Your cart</h2><p class="muted">Review your favourites before sending them to our kitchen.</p></div><div class="checkout-table-pill" id="checkoutTablePill">TABLE 01</div></div><div class="checkout-layout"><div class="checkout-items-wrap"><div class="checkout-section-title">Items in your order <span id="checkoutItemCount">0 items</span></div><div id="cartRows"></div><button class="add-more-btn" onclick="closeCart()">＋ Add more items</button></div><aside class="checkout-summary"><div class="checkout-section-title">Order summary</div><div class="summary-line"><span>Subtotal</span><strong id="checkoutSubtotal">₹0</strong></div><div class="summary-line"><span>Service</span><span class="included">At your table</span></div><div class="summary-divider"></div><div class="total-row"><span>Total</span><span id="cartTotal">₹0</span></div><div class="field"><label for="customerName">YOUR NAME *</label><input id="customerName" maxlength="100" placeholder="Enter your name" autocomplete="name"></div><div class="field"><label for="customerPhone">PHONE NUMBER (OPTIONAL)</label><input id="customerPhone" maxlength="20" type="tel" placeholder="Enter mobile number" autocomplete="tel"></div><div id="checkoutPayment" class="checkout-payment hidden"><div class="checkout-section-title">Payment method <span>Choose how to pay</span></div><div id="checkoutPaymentChoices" class="payment-choice-grid"></div><div id="checkoutPaymentDetail" class="payment-detail hidden"></div></div><button class="primary checkout-submit" id="submitBtn" style="width:100%" onclick="submitOrder()">Place my order <span>→</span></button><div class="checkout-trust"><span>✓</span> Your order is sent directly to our restaurant team.</div></aside></div></section>
@@ -398,7 +470,7 @@ async function loadCustomerOrders(){
   '<div class="order-items-grid">'+draftRows.map(i=>{const imgItem=menuItems.find(m=>m.id===(i.id||i.menu_item_id));const src=imgItem?imageFor(imgItem):"";return '<div class="order-item" data-line="'+(i.id||i.menu_item_id)+'">'+(src?'<div class="order-item-photo"><img loading="eager" decoding="async" src="'+esc(src)+'" alt="'+esc(i.name||i.item_name)+'" onerror="imageFallback(this)"></div>':'<div class="order-item-photo" aria-hidden="true"></div>')+'<div class="order-item-info"><strong>'+esc(i.name||i.item_name)+' × '+i.quantity+'</strong><span class="muted">'+money(i.price||i.unit_price)+' each</span></div><span class="order-item-price" data-line-total>'+money((i.price||i.unit_price)*i.quantity)+'</span>'+(editing?'<div class="qty"><button aria-label="Decrease quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',-1)">−</button><strong data-quantity>'+i.quantity+'</strong><button aria-label="Increase quantity" onclick="draftOrderQty(\''+o.id+'\',\''+i.id+'\',1)">+</button></div>':'')+'</div>'}).join("")+'</div>'+
   (editing?'<div class="edit-order-actions" style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px"><button class="liquid-btn" style="width:100%" data-edit-order="'+o.id+'" onclick="goAddFoodMenu(this.dataset.editOrder)"><span>＋ Add food to this order</span></button><button class="primary" style="width:100%;min-height:50px" data-confirm-edit="'+o.id+'" onclick="confirmOrderEdit(this.dataset.confirmEdit)"><span>Place updated order →</span></button><button class="liquid-btn" style="width:100%" onclick="cancelCustomerEdit(\''+o.id+'\')"><span>Cancel editing</span></button></div>':'')+
   '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px">'+(accepted?'<span class="timer-chip '+(remaining===0?'expired':'')+'" id="timer-'+o.id+'">'+(remaining?'⏱ '+String(Math.floor(remaining/60000)).padStart(2,'0')+':'+String(Math.floor(remaining/1000)%60).padStart(2,'0'):'⏱ Edit window ended')+'</span>':'<span class="timer-chip">Waiting for staff to accept</span>')+
-  (editing?'': '<button class="liquid-btn" '+(!accepted||status==="pending"||(remaining===0&&!activeApproval&&requestsUsed>=3)?'disabled':'')+' onclick="askToEditOrder(\''+o.id+'\','+remaining+')"><span>'+(!accepted?'Waiting for staff to accept':status==="pending"?'Waiting for staff approval':(remaining===0&&!activeApproval&&requestsUsed>=3)?'Request limit reached (3/3)':(remaining>0||activeApproval)?'✦ Edit order':'Request edit ('+requestsUsed+'/3)')+'</span></button>')+'</div></article>';
+  (editing?'': '<button class="liquid-btn" '+(!accepted||status==="pending"||(remaining===0&&!activeApproval&&requestsUsed>=3)?'disabled':'')+' onclick="askToEditOrder(\''+o.id+'\','+remaining+')"><span>'+'✦ Edit order'+'</span></button>')+'</div></article>';
  }).join("");
  updateCustomerTimers(orders);requestAnimationFrame(()=>{if(!document.body.classList.contains("orders-page")&&!document.body.classList.contains("checkout-page"))return;window.scrollTo({top:savedWindowY,behavior:"instant"});const currentBox=$("customerOrdersList");if(currentBox){currentBox.scrollTop=savedListY;const list=currentBox.querySelector(".order-items-grid");if(list)list.scrollTop=savedOrderScroll}});
 }
@@ -535,9 +607,9 @@ async function loadOrders(){
  requestAnimationFrame(()=>{window.scrollTo({top:staffSavedScrollY,behavior:"instant"});const list=$("orders");if(list)list.scrollTop=staffSavedListY});
  await loadEditRequests();
 }
-function updateServeLocks(){document.querySelectorAll(".served-btn").forEach(btn=>{const action=btn.getAttribute("onclick")||"";const marker="markServed('";const pos=action.indexOf(marker);if(pos<0)return;const idStart=pos+marker.length;const idEnd=action.indexOf("'",idStart);const orderId=action.slice(idStart,idEnd);const acceptedAt=staffAcceptTimes[orderId]||0;if(!acceptedAt){btn.disabled=true;btn.textContent="🔒 Accept first";return}const delay=(staffServeDelays[orderId]===false)?0:300000;const ms=acceptedAt+delay-Date.now();if(ms<=0){btn.disabled=false;btn.textContent="Served 👍🏻";return}btn.disabled=true;const total=Math.ceil(ms/1000);btn.textContent="🔒 Serve in "+String(Math.floor(total/60)).padStart(2,"0")+":"+String(total%60).padStart(2,"0")})}
+function updateServeLocks(){document.querySelectorAll(".served-btn").forEach(btn=>{const action=btn.getAttribute("onclick")||"";const marker="markServed('";const pos=action.indexOf(marker);if(pos<0)return;const idStart=pos+marker.length;const idEnd=action.indexOf("'",idStart);const orderId=action.slice(idStart,idEnd);const acceptedAt=staffAcceptTimes[orderId]||0;if(!acceptedAt){btn.disabled=true;btn.textContent="Complete order";return}const delay=(staffServeDelays[orderId]===false)?0:300000;const ms=acceptedAt+delay-Date.now();if(ms<=0){btn.disabled=false;btn.textContent="Served 👍🏻";return}btn.disabled=true;btn.textContent="Complete order"})}
 setInterval(()=>{if(staffMode&&$("dashboard")&&!$("dashboard").classList.contains("hidden"))updateServeLocks()},1000);let staffMissingMembershipCount=0;let staffMembershipWatch=setInterval(async()=>{if(!staffMode)return;const {data}=await db.auth.getSession();if(!data.session)return;const {data:member,error:membershipError}=await db.from("staff_members").select("user_id,role,is_active").eq("user_id",data.session.user.id).eq("restaurant_id",restaurantId).maybeSingle();if(membershipError)return;if(!member||member.is_active===false||!["waiter","kitchen"].includes(member.role)){staffMissingMembershipCount++;if(staffMissingMembershipCount<3)return;await db.auth.signOut();location.href=location.pathname+"?staff=1";return}staffMissingMembershipCount=0},1000);
-async function acceptOrder(id,confirmed=false){if(!confirmed){pendingModalAction=()=>acceptOrder(id,true);showModal("Accept this order?","This will accept the order and start the customer’s 2-minute edit timer.","Accept order");return}const {error}=await db.rpc("accept_table_order",{p_order_id:id});if(error){notify("Could not accept order: "+error.message,"error");return}notify("Order accepted. Customer's 2-minute timer has started.");await loadOrders()}
+async function acceptOrder(id,confirmed=false){if(!confirmed){pendingModalAction=()=>acceptOrder(id,true);showModal("Accept this order?","Accept this order and send it to the kitchen.","Accept order");return}const {error}=await db.rpc("accept_table_order",{p_order_id:id});if(error){notify("Could not accept order: "+error.message,"error");return}notify("Order accepted.");await loadOrders()}
 async function setOrderStatus(id,status,confirmed=false){if(!confirmed){pendingModalAction=()=>setOrderStatus(id,status,true);showModal("Confirm order status","Change this order status to "+status+"?","Save status");return}const {error}=await db.from("orders").update({status}).eq("id",id).eq("restaurant_id",restaurantId);if(error){notify("Could not update status: "+error.message,"error");return}notify("Order status changed to "+status+".");await loadOrders()}
 
 
