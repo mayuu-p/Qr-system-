@@ -366,7 +366,7 @@ button,input,select,textarea{font:inherit}
 .checkout-page .checkout-summary>.checkout-trust{flex-shrink:0!important}
 .checkout-page .checkout-summary #checkoutPayment{min-height:0!important;overflow:hidden!important}
 .checkout-page .checkout-summary #checkoutPaymentDetail{max-height:clamp(90px,30vh,300px)!important;overflow:hidden!important}
-.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(150px,100%)!important;max-height:clamp(70px,18vh,170px)!important;object-fit:contain!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(220px,100%)!important;max-width:100%!important;max-height:220px!important;height:auto!important;object-fit:contain!important}
 @media(min-width:761px){
  .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
  .checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(300px,.8fr)!important;gap:clamp(10px,1.2vw,18px)!important}
@@ -1321,6 +1321,10 @@ body:not(.checkout-page) *{touch-action:pan-y}
   }
 }
 
+.customer-header-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;flex-wrap:nowrap!important;min-width:0!important}
+.customer-header-actions .table-pill,.customer-header-actions #customerOrdersBtn,.customer-header-actions #customerRefreshBtn{display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;min-height:40px!important;padding:9px 12px!important;font-weight:900!important;font-size:13px!important;line-height:1.2!important;letter-spacing:.2px!important;white-space:nowrap!important;text-align:center!important}
+@media(max-width:600px){.customer-header-actions{gap:6px!important}.customer-header-actions .table-pill,.customer-header-actions #customerOrdersBtn,.customer-header-actions #customerRefreshBtn{min-height:36px!important;padding:7px 8px!important;font-size:11px!important}}
+@media(max-width:760px){.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(190px,100%)!important;max-width:100%!important;max-height:190px!important;height:auto!important}}
 /* Customer header actions: TABLE NO. → ORDERS → REFRESH, bold and clearly visible. */
 .customer-header-actions{
  display:flex!important;align-items:center!important;justify-content:flex-end!important;
@@ -1349,7 +1353,7 @@ body:not(.checkout-page) *{touch-action:pan-y}
 </style>
 </head>
 <body>
-<header><div class="top"><div><div class="brand">THYME <span>&</span> WHISK.</div><div class="tag">Good food. Good mood.</div></div><div style="display:flex;align-items:center;gap:8px"><button id="customerRefreshBtn" class="secondary" onclick="window.location.reload()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">↻ Refresh</button><button id="customerOrdersBtn" class="secondary hidden" onclick="openCustomerOrders()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">Orders <span id="customerOrdersCount"></span></button><div class="table-pill" id="tableLabel">Finding your table...</div></div></div></header>
+<header><div class="top"><div><div class="brand">THYME <span>&</span> WHISK.</div><div class="tag">Good food. Good mood.</div></div><div class="customer-header-actions"><div class="table-pill" id="tableLabel">Finding your table...</div><button id="customerOrdersBtn" class="secondary hidden" onclick="openCustomerOrders()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">Orders <span id="customerOrdersCount"></span></button><button id="customerRefreshBtn" class="secondary" onclick="window.location.reload()" style="background:#ffffff17;color:white;border-color:#ffffff30;border-radius:24px;padding:9px 12px;font-size:12px">↻ Refresh</button></div></div></header>
 <main><div id="notice" class="notice hidden"></div><div id="appModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><div class="confirm-icon" style="margin:0 0 16px">?</div><h2 id="modalTitle" style="font-size:25px">Confirm action</h2><p id="modalMessage" class="muted" style="line-height:1.6"></p><div class="order-actions" style="justify-content:flex-end"><button class="secondary" onclick="closeModal()">Cancel</button><button id="modalConfirmBtn" class="primary" onclick="confirmModalAction()">Confirm</button></div></div></div><section id="customerView"><section id="customerOrdersPanel" class="panel hidden"><div class="section-head" style="margin-top:0;flex-wrap:wrap"><div><div class="eyebrow">Your table</div><h2>Active orders</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="liquid-btn" onclick="backToMenu()"><span>← Back to menu</span></button></div></div><div id="customerOrdersList"></div></section>
 <div class="hero"><div class="hero-copy"><div class="eyebrow">Made fresh, served with love</div><h1>A little taste of happiness.</h1><p>Explore our menu, choose your favourites and order right from your table.</p></div><img src="coldcoffee.jpg" alt="" onerror="this.style.display='none'"></div>
 <div class="section-head"><div><div class="eyebrow">Our kitchen</div><h2>Find your favourite</h2></div><span id="menuCount" class="muted"></span></div><div id="categories" class="categories"></div><div id="menu" class="grid">Loading fresh menu...</div>
