@@ -1298,6 +1298,28 @@ body:not(.checkout-page) *{touch-action:pan-y}
  }
  body.checkout-page #cartPanel #cartRows{height:auto!important;max-height:52dvh!important;overflow-y:auto!important}
 }
+
+/* Scan-to-pay QR: enlarge inside its existing payment detail card without widening layout. */
+#checkoutPaymentDetail img[alt*="QR" i],
+#checkoutPaymentDetail .qr-code,
+#checkoutPaymentDetail img{
+  width:min(220px,100%)!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  display:block!important;
+  margin:10px auto!important;
+}
+@media(max-width:760px){
+  #checkoutPaymentDetail img[alt*="QR" i],
+  #checkoutPaymentDetail .qr-code,
+  #checkoutPaymentDetail img{
+    width:min(190px,100%)!important;
+    max-width:100%!important;
+    height:auto!important;
+  }
+}
 </style>
 </head>
 <body>
