@@ -1320,6 +1320,32 @@ body:not(.checkout-page) *{touch-action:pan-y}
     height:auto!important;
   }
 }
+
+/* Customer header actions: TABLE NO. → ORDERS → REFRESH, bold and clearly visible. */
+.customer-header-actions{
+ display:flex!important;align-items:center!important;justify-content:flex-end!important;
+ gap:10px!important;flex-wrap:nowrap!important;min-width:0!important;
+}
+.customer-header-actions .table-pill,
+.customer-header-actions #customerOrdersBtn,
+.customer-header-actions #customerRefreshBtn{
+ font-weight:900!important;font-size:13px!important;letter-spacing:.2px!important;
+ line-height:1.2!important;white-space:nowrap!important;text-align:center!important;
+}
+.customer-header-actions .table-pill{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ min-height:40px!important;padding:10px 13px!important;
+}
+.customer-header-actions #customerOrdersBtn,
+.customer-header-actions #customerRefreshBtn{
+ min-height:40px!important;padding:10px 13px!important;border-width:1px!important;
+}
+@media(max-width:600px){
+ .customer-header-actions{gap:6px!important}
+ .customer-header-actions .table-pill,
+ .customer-header-actions #customerOrdersBtn,
+ .customer-header-actions #customerRefreshBtn{font-size:11px!important;padding:8px 8px!important;min-height:36px!important}
+}
 </style>
 </head>
 <body>
