@@ -365,10 +365,10 @@ button,input,select,textarea{font:inherit}
 .checkout-page .checkout-summary>.checkout-submit,
 .checkout-page .checkout-summary>.checkout-trust{flex-shrink:0!important}
 .checkout-page .checkout-summary #checkoutPayment{min-height:0!important;overflow:hidden!important}
-.checkout-page .checkout-summary #checkoutPaymentDetail{max-height:clamp(90px,30vh,300px)!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-width:thin!important;scrollbar-color:#c7d6ca transparent!important}
-.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(220px,100%)!important;max-width:100%!important;max-height:none!important;height:auto!important;aspect-ratio:1/1!important;object-fit:contain!important;margin:2px auto 4px!important;position:relative!important;top:-4px!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail{height:auto!important;max-height:none!important;overflow:visible!important;scrollbar-width:none!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail img{display:block!important;width:min(220px,100%)!important;max-width:100%!important;max-height:none!important;height:auto!important;aspect-ratio:1/1!important;object-fit:contain!important;margin:4px auto!important;position:static!important}
 .checkout-page .checkout-summary #checkoutPaymentDetail .pay-amount{margin:2px 0!important}
-.checkout-page .checkout-summary #checkoutPaymentDetail small{line-height:1.25!important}
+.checkout-page .checkout-summary #checkoutPaymentDetail small{line-height:1.2!important}
 @media(min-width:761px){
  .checkout-page main{height:calc(100dvh - 78px)!important;min-height:0!important;overflow:hidden!important}
  .checkout-page .checkout-layout{display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(300px,.8fr)!important;gap:clamp(10px,1.2vw,18px)!important}
@@ -1326,7 +1326,7 @@ body:not(.checkout-page) *{touch-action:pan-y}
 .customer-header-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;flex-wrap:nowrap!important;min-width:0!important}
 .customer-header-actions .table-pill,.customer-header-actions #customerOrdersBtn,.customer-header-actions #customerRefreshBtn{display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;min-height:40px!important;padding:9px 12px!important;font-weight:900!important;font-size:13px!important;line-height:1.2!important;letter-spacing:.2px!important;white-space:nowrap!important;text-align:center!important}
 @media(max-width:600px){.customer-header-actions{gap:6px!important}.customer-header-actions .table-pill,.customer-header-actions #customerOrdersBtn,.customer-header-actions #customerRefreshBtn{min-height:36px!important;padding:7px 8px!important;font-size:11px!important}}
-@media(max-width:760px){.checkout-page .checkout-summary #checkoutPaymentDetail{max-height:clamp(120px,34vh,320px)!important;overflow-y:auto!important;overflow-x:hidden!important}.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(190px,100%)!important;max-width:100%!important;max-height:none!important;height:auto!important;aspect-ratio:1/1!important;margin:0 auto 3px!important;top:-5px!important}}
+@media(max-width:760px){.checkout-page .checkout-summary #checkoutPaymentDetail{height:auto!important;max-height:none!important;overflow:visible!important}.checkout-page .checkout-summary #checkoutPaymentDetail img{width:min(190px,100%)!important;max-width:100%!important;max-height:none!important;height:auto!important;aspect-ratio:1/1!important;margin:3px auto!important;position:static!important}}
 /* Customer header actions: TABLE NO. → ORDERS → REFRESH, bold and clearly visible. */
 .customer-header-actions{
  display:flex!important;align-items:center!important;justify-content:flex-end!important;
