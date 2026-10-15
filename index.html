@@ -1001,6 +1001,35 @@ body:not(.checkout-page) *{touch-action:pan-y}
  .checkout-page .checkout-items-wrap{max-height:none!important;overflow:hidden!important}
  .checkout-page #cartRows{max-height:42dvh!important;overflow-y:auto!important}
 }
+
+/* Exact checkout alignment: summary touches the Orders/Table header area. */
+.checkout-page .checkout-heading{
+  margin-bottom:0!important;
+  padding-bottom:0!important;
+}
+.checkout-page .checkout-layout{
+  margin-top:0!important;
+  padding-top:0!important;
+  gap:0!important;
+  align-items:start!important;
+  overflow:visible!important;
+}
+.checkout-page .checkout-summary{
+  position:relative!important;
+  top:0!important;
+  margin-top:0!important;
+  transform:none!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  align-self:start!important;
+}
+@media(max-width:760px){
+  .checkout-page .checkout-heading{margin-bottom:0!important;padding-bottom:0!important}
+  .checkout-page .checkout-layout{gap:0!important;margin-top:0!important;padding-top:0!important}
+  .checkout-page .checkout-summary{top:0!important;margin-top:0!important}
+}
 </style>
 </head>
 <body>
