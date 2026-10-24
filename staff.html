@@ -619,17 +619,40 @@ const $=id=>document.getElementById(id),money=n=>"₹"+Number(n||0).toFixed(2);
 function playStaffOrderSound(){
  try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return;if(!staffAudioContext)staffAudioContext=new AudioCtx();if(staffAudioContext.state==="suspended")staffAudioContext.resume();const ctx=staffAudioContext,now=ctx.currentTime;[0,0.22].forEach((offset,index)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type="sine";osc.frequency.setValueAtTime(index?1046:784,now+offset);gain.gain.setValueAtTime(.0001,now+offset);gain.gain.exponentialRampToValueAtTime(.18,now+offset+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+offset+.18);osc.connect(gain);gain.connect(ctx.destination);osc.start(now+offset);osc.stop(now+offset+.2)})}catch(e){}
 }
+let staffServiceWorkerRegistration=null;
+async function registerStaffServiceWorker(){
+ if(!("serviceWorker" in navigator))return null;
+ try{staffServiceWorkerRegistration=await navigator.serviceWorker.register(new URL("sw.js",location.href),{scope:"./"});await navigator.serviceWorker.ready;return staffServiceWorkerRegistration}
+ catch(e){console.warn("Staff service worker registration failed",e);return null}
+}
 async function enableStaffNotifications(){
  const button=$("staffNotificationButton");
- try{if(!("Notification" in window)){notify("This browser does not support desktop notifications. Website alerts still work.");if(button)button.textContent="🔔 Popup alerts ready";return}
- const permission=Notification.permission==="default"?await Notification.requestPermission():Notification.permission;
- if(permission==="granted"){try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(AudioCtx){if(!staffAudioContext)staffAudioContext=new AudioCtx();await staffAudioContext.resume()}}catch(e){}if(button)button.textContent="🔔 Alerts enabled";playStaffOrderSound();notify("Staff order alerts enabled.","success")}
- else{if(button)button.textContent="🔔 Allow in browser settings";notify("Allow notifications in your browser/site settings. Website popup alerts still work.","error")}}catch(e){notify("Could not enable browser notifications. Website popups still work.","error")}
+ try{
+  if(!("Notification" in window)){notify("This browser does not support system notifications. Website sound still works.");return}
+  const permission=Notification.permission==="default"?await Notification.requestPermission():Notification.permission;
+  if(permission==="granted"){
+   await registerStaffServiceWorker();
+   try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(AudioCtx){if(!staffAudioContext)staffAudioContext=new AudioCtx();await staffAudioContext.resume()}}catch(e){}
+   if(button)button.textContent="🔔 System alerts enabled";
+   if(staffServiceWorkerRegistration)await staffServiceWorkerRegistration.showNotification("Staff order alerts enabled",{body:"Browser notifications are allowed on this device.",tag:"staff-alerts-ready"});
+   notify("Browser notifications allowed on this device.","success");
+  }else{
+   if(button)button.textContent="🔔 Allow notifications in browser settings";
+   notify("Allow notifications for this site in Chrome settings. Website sound still works.","error")
+  }
+ }catch(e){console.warn("Could not enable browser notifications",e);notify("Could not enable system notifications. Check Chrome site permissions.","error")}
 }
-function alertStaffForNewOrder(order,tableNumber){
+async function alertStaffForNewOrder(order,tableNumber){
  const table=String(tableNumber||"?").replace(/^0+/,"")||"1",code=order.order_code||shortCode(order.id),message="New order received — Table "+table+" · Order #"+code;
  notify("🔔 "+message,"success");playStaffOrderSound();
- if("Notification" in window&&Notification.permission==="granted"){try{const n=new Notification("New Restaurant Order",{body:"Table "+table+" · Order #"+code,tag:"restaurant-order-"+order.id,renotify:false});n.onclick=()=>{window.focus();n.close()}}catch(e){}}
+ if("Notification" in window&&Notification.permission==="granted"){
+  try{
+   const registration=staffServiceWorkerRegistration||await registerStaffServiceWorker();
+   const options={body:"Table "+table+" · Order #"+code,tag:"restaurant-order-"+order.id,renotify:false,data:{url:location.href,orderId:order.id},vibrate:[250,100,250]};
+   if(registration)await registration.showNotification("New Restaurant Order",options);
+   else{const n=new Notification("New Restaurant Order",options);n.onclick=()=>{window.focus();n.close()}}
+  }catch(e){console.warn("System order notification failed",e);notify("Order sound played, but Chrome blocked the system popup. Check site notification permission.","error")}
+ }
 }
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function notify(message,type="info"){
@@ -809,7 +832,7 @@ function subscribeCustomerOrders(){
 function newOrder(){if(window.orderSuccessTimer){clearTimeout(window.orderSuccessTimer);window.orderSuccessTimer=null}$("confirmation").classList.add("hidden");$("confirmation").classList.remove("order-success-overlay");$("customerName").value="";$("customerPhone").value="";window.scrollTo({top:0,behavior:"smooth"})}
 /* Staff dashboard */
 $("loginForm").addEventListener("submit",async e=>{e.preventDefault();await enableStaffNotifications();const {error}=await db.auth.signInWithPassword({email:$("staffEmail").value.trim(),password:$("staffPassword").value});if(error){notify("Login failed: "+error.message,"error");return}await checkSession()});
-async function checkSession(){const {data, error:sessionError}=await db.auth.getSession();if(sessionError){notify("Session could not be restored yet. Please retry in a moment.","error");return}if(!data.session){$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");return}let member=null,error=null;for(let attempt=0;attempt<3;attempt++){const result=await db.from("staff_members").select("role,is_active").eq("user_id",data.session.user.id).eq("restaurant_id",restaurantId).maybeSingle();member=result.data;error=result.error;if(!error)break;await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)))}if(error){notify("Could not verify staff access due to a temporary connection issue. Your session is kept; tap retry or refresh again.","error");return}if(!member||member.is_active===false||!["waiter","kitchen"].includes(member.role)){await db.auth.signOut();$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");notify("This account does not have staff access. Please use the correct login page.","error");return}$("loginPanel").classList.add("hidden");await loadMenu();if(tablesPage){$("dashboard").classList.add("hidden");$("tablesPage").classList.remove("hidden");renderTableLinks()}else{$("tablesPage").classList.add("hidden");$("dashboard").classList.remove("hidden");await loadOrders();subscribeOrders()}}
+async function checkSession(){await registerStaffServiceWorker();const {data, error:sessionError}=await db.auth.getSession();if(sessionError){notify("Session could not be restored yet. Please retry in a moment.","error");return}if(!data.session){$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");return}let member=null,error=null;for(let attempt=0;attempt<3;attempt++){const result=await db.from("staff_members").select("role,is_active").eq("user_id",data.session.user.id).eq("restaurant_id",restaurantId).maybeSingle();member=result.data;error=result.error;if(!error)break;await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)))}if(error){notify("Could not verify staff access due to a temporary connection issue. Your session is kept; tap retry or refresh again.","error");return}if(!member||member.is_active===false||!["waiter","kitchen"].includes(member.role)){await db.auth.signOut();$("dashboard").classList.add("hidden");$("tablesPage").classList.add("hidden");$("loginPanel").classList.remove("hidden");notify("This account does not have staff access. Please use the correct login page.","error");return}$("loginPanel").classList.add("hidden");await loadMenu();if(tablesPage){$("dashboard").classList.add("hidden");$("tablesPage").classList.remove("hidden");renderTableLinks()}else{$("tablesPage").classList.add("hidden");$("dashboard").classList.remove("hidden");await loadOrders();subscribeOrders()}}
 const TABLE_LINK_IDS=[
 ["01","22222222-2222-4222-8222-222222222222"],["02","33333333-3333-4333-8333-333333333333"],
 ["03","96c054ec-ad33-4816-9ca6-0969199a1ca3"],["04","972b0889-e660-4b1d-9008-92a57bd0baa2"],
