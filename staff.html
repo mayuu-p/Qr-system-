@@ -819,6 +819,17 @@ p,.muted,.sub,.desc,.tag,footer,.section-head .eyebrow,.hero p,.card p,.card .de
 .card .photo img{display:block;content-visibility:auto}
 input::placeholder,textarea::placeholder{color:#5b6d83!important;opacity:1!important}
 
+
+/* Higher contrast for staff orders, labels and totals; keep browser-native scrolling fast. */
+html,body{scroll-behavior:auto!important;overscroll-behavior-y:auto!important;-webkit-overflow-scrolling:touch!important}
+#staffView{color:#1f3047!important}
+#staffView .muted,#staffView .sub,#staffView small,#staffView label,#staffView .order-item-info span,#staffView .staff-customer-identity,#staffView .payment-order-chip span{color:#344c68!important;opacity:1!important}
+#staffView .order-item-info strong,#staffView .order-item-info b,#staffView .order-total,#staffView .price,#staffView .amount{color:#1d334c!important;opacity:1!important}
+#staffView .panel,#staffView .order,#staffView #editRequests>.panel{border-color:#b6cbe0!important}
+#staffView button:disabled{opacity:.85!important}
+#staffView input::placeholder,#staffView textarea::placeholder{color:#526981!important;opacity:1!important}
+#staffView .panel,#staffView .order,#staffView .order-items-grid>.order-item{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 <script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 </head>
