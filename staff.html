@@ -788,8 +788,21 @@ footer{color:#6f829e}
  #staffProfileToggle .staff-avatar-mini{width:29px!important;height:29px!important;min-width:29px!important}
 }
 
+
+/* ACCESSIBILITY / CONTRAST PASS: strengthen low-contrast glass labels and actions. */
+:root{--muted:#536985!important;--line:#c9d8e9!important}
+#staffView{color:#263a53}
+#staffView .muted,#staffView .sub,#staffView small,#staffView .order-item-info span,#staffView .staff-customer-identity,#staffView .payment-order-chip span{color:#405a78!important;opacity:1!important}
+#staffView .panel,#staffView .order,#staffView #editRequests>.panel{border-color:#c4d5e8!important}
+#staffView .order-items-grid>.order-item{background:rgba(255,255,255,.96)!important;border-color:#d1deec!important;color:#263a53!important}
+#staffView .order-item-info strong,#staffView .order-item-info b{color:#20364f!important}
+#staffView .payment-order-chip{background:#edf4fc!important;border-color:#c7d8ea!important;color:#304d6b!important}
+#staffView .order-actions .secondary,.staff-refresh,.staff-header-actions #customerOrdersBtn{color:#304c6b!important;border-color:#c3d5e8!important;background:rgba(255,255,255,.96)!important}
+#staffView button:disabled{opacity:.78!important}
+#staffView input::placeholder,#staffView textarea::placeholder{color:#657a92!important;opacity:1!important}
+
 </style>
-<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026j"){u.searchParams.set("v","20261026j");location.replace(u.href)}})();</script>
+<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 </head>
 <body>
 <header class="staff-glass-header"><div class="top staff-glass-top"><div class="staff-brand-wrap"><div class="brand" id="restaurantBrandName">THYME &amp; WHISK.</div><div class="tag staff-subtitle">STAFF CONTROL CENTRE <span class="staff-online-dot"></span><span>Live</span></div></div><div class="staff-header-actions"><button id="customerRefreshBtn" class="secondary staff-refresh" onclick="window.location.reload()" aria-label="Refresh dashboard" title="Refresh dashboard">↻ <span>Refresh</span></button><button id="customerOrdersBtn" class="secondary hidden" onclick="openCustomerOrders()" aria-label="Orders">Orders <span id="customerOrdersCount"></span></button><div class="table-pill" id="tableLabel">Finding your table...</div><button id="staffProfileToggle" class="staff-profile-trigger" type="button" aria-label="Open staff profile" aria-expanded="false" aria-controls="staffProfileMenu" title="Staff profile"><span class="staff-avatar-mini" id="staffAvatarInitial">S</span><span class="staff-profile-trigger-text"><strong id="staffHeaderName">Staff account</strong><small id="staffHeaderEmail">Signed in</small></span><span class="staff-profile-chevron">⌄</span></button></div><div id="staffProfileMenu" class="staff-profile-menu hidden" role="dialog" aria-label="Staff profile"><div class="staff-profile-card-top"><div class="staff-profile-avatar" id="staffProfileInitial">S</div><div class="staff-profile-meta"><strong id="staffProfileName">Staff account</strong><span id="staffProfileRole">Staff member</span></div></div><div class="staff-profile-email-label">SIGNED IN EMAIL</div><div id="staffProfileEmail" class="staff-profile-email">—</div><button class="staff-profile-logout" type="button" onclick="logout()">↪ <span>Log out</span></button></div></div></header>
