@@ -1450,6 +1450,9 @@ footer{color:#8092a8}
 }
 @media(prefers-reduced-motion:reduce){.card,.card .photo img,#categories.categories>button{transition:none!important}}
 
+
+/* Performance: keep glass blur on the header/cart, not on every food tile. */
+#menu .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;content-visibility:auto;contain-intrinsic-size:320px}
 </style>
 
 <style id="staff-laptop-tablet-layout-fix">
