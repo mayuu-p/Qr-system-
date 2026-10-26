@@ -430,6 +430,20 @@ th{background:rgba(220,231,246,.88)!important}
 .mobile-nav button.active{color:#fff!important}
 button:disabled{opacity:.78!important}
 
+
+/* Stronger contrast + smoother native scrolling across owner dashboard. */
+html,body{scroll-behavior:auto!important;overscroll-behavior-y:auto!important;-webkit-overflow-scrolling:touch!important}
+body{color:#1f3047!important}
+.sub,.eyebrow,.metric small,.metric span,.profile-email-label,.form-field label,th,.panel-head p,.page-head p,aside .label,.aside-bottom{color:#405570!important;opacity:1!important}
+td,.table-wrap td,.metric strong,.panel-head h2,.page-head h1,.form-field,.profile-menu,.profile-email{color:#253951!important;opacity:1}
+.metric,.panel,.table-card,.payment-order-card,.profile-menu,.mobile-nav{border-color:#b9cbe0!important}
+.field,input,select,textarea{color:#20354e!important}
+.field::placeholder,input::placeholder,textarea::placeholder{color:#5b6d83!important;opacity:1!important}
+.btn:not(.primary):not(.green):not(.danger){color:#2e4867!important}
+.mobile-nav button{color:#3f5571!important}
+.mobile-nav button.active{color:#fff!important}
+@media(max-width:700px){.main{scroll-behavior:auto!important;-webkit-overflow-scrolling:touch!important}.mobile-nav{backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 <script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 </head>
