@@ -762,6 +762,32 @@ footer{color:#6f829e}
 /* Performance: avoid compositing blur on every live order card during scroll. */
 #staffView .order{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;content-visibility:auto;contain-intrinsic-size:360px}
 #staffView .panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* Match the owner's mobile header controls: one-line Refresh + circular profile. */
+@media(max-width:700px){
+ .staff-glass-header{padding:9px 10px!important}
+ .staff-glass-top{width:100%!important;max-width:none!important;min-height:54px!important;padding:0!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+ .staff-brand-wrap{flex:1 1 auto!important;min-width:0!important}
+ .staff-brand-wrap .brand{max-width:none!important;font-size:clamp(13px,3.5vw,16px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ .staff-subtitle{font-size:8px!important;white-space:nowrap!important}
+ .staff-header-actions{flex:0 0 auto!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;min-width:max-content!important}
+ #customerRefreshBtn.staff-refresh{display:inline-flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:7px!important;width:auto!important;min-width:101px!important;max-width:none!important;height:40px!important;min-height:40px!important;padding:8px 11px!important;border-radius:11px!important;font-size:12px!important;line-height:1!important;white-space:nowrap!important;overflow:visible!important}
+ #customerRefreshBtn.staff-refresh span{display:inline!important;visibility:visible!important;font-size:12px!important;line-height:1!important;white-space:nowrap!important}
+ #staffProfileToggle.staff-profile-trigger{display:grid!important;place-items:center!important;width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;min-height:40px!important;flex:0 0 40px!important;padding:2px!important;border-radius:50%!important}
+ #staffProfileToggle .staff-avatar-mini{display:grid!important;place-items:center!important;width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;margin:0!important}
+ #staffProfileToggle .staff-profile-trigger-text,#staffProfileToggle .staff-profile-chevron{display:none!important}
+ .staff-profile-menu{right:0!important;top:calc(100% + 8px)!important}
+}
+@media(max-width:360px){
+ .staff-glass-top{gap:5px!important}
+ .staff-brand-wrap .brand{font-size:12px!important}
+ .staff-subtitle{letter-spacing:.02em!important;font-size:7px!important}
+ .staff-header-actions{gap:5px!important}
+ #customerRefreshBtn.staff-refresh{min-width:91px!important;padding:8px 8px!important}
+ #staffProfileToggle.staff-profile-trigger{width:36px!important;height:36px!important;min-width:36px!important;flex-basis:36px!important}
+ #staffProfileToggle .staff-avatar-mini{width:29px!important;height:29px!important;min-width:29px!important}
+}
+
 </style>
 <script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026j"){u.searchParams.set("v","20261026j");location.replace(u.href)}})();</script>
 </head>
