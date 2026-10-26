@@ -758,6 +758,10 @@ footer{color:#6f829e}
 .staff-avatar-mini{width:32px!important;height:32px!important;border-radius:50%!important;background:linear-gradient(145deg,#70baf0,#7589e8)!important;color:#fff!important;border:1px solid rgba(255,255,255,.98)!important}
 .staff-profile-trigger-text,.staff-profile-chevron{display:none!important}
 @media(max-width:650px){.staff-refresh{width:40px!important;min-width:40px!important;height:40px!important;padding:0!important;border-radius:11px!important}.staff-profile-trigger{width:40px!important;height:40px!important;min-width:40px!important;flex-basis:40px!important}}
+
+/* Performance: avoid compositing blur on every live order card during scroll. */
+#staffView .order{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;content-visibility:auto;contain-intrinsic-size:360px}
+#staffView .panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 </style>
 <script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026j"){u.searchParams.set("v","20261026j");location.replace(u.href)}})();</script>
 </head>
