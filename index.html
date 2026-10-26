@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026d"){u.searchParams.set("v","20261026d");location.replace(u.href)}})();</script>
+<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026e"){u.searchParams.set("v","20261026e");location.replace(u.href)}})();</script>
 <meta name="theme-color" content="#17251f">
 <title>Thyme & Whisk | Order at Your Table</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1725,7 +1725,7 @@ let pullStartY=0;document.addEventListener("touchstart",e=>{if(e.touches&&e.touc
   const coast=now=>{
    const dt=Math.min(32,Math.max(1,now-previous));previous=now;
    rail.scrollLeft+=velocity*dt;
-   velocity*=Math.pow(0.94,dt/16.67);
+   velocity*=Math.pow(0.965,dt/16.67);
    if(Math.abs(velocity)<0.035||rail.scrollLeft<=0||rail.scrollLeft>=Math.max(0,rail.scrollWidth-rail.clientWidth)){raf=0;velocity=0;return}
    raf=requestAnimationFrame(coast);
   };
