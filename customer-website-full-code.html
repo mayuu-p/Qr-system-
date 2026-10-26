@@ -588,12 +588,22 @@ const IMAGE_BY_NORMALIZED_NAME={
   vegsandwich:"vegsandwich.jpg",vegsandwichspecial:"vegsandwich.jpg",whitesaucepasta:"whitesaucepasta.jpg"
 };
 function imageFor(item){
-  const path=String(item?.image_path||"").trim();
-  // Supabase's path must be a simple root filename, not an injected URL.
-  if(path && /^[a-z0-9-]+\.jpg$/i.test(path))return "https://raw.githubusercontent.com/mayuu-p/tester/main/"+encodeURIComponent(path)+"?v=2";
-  const normalized=String(item?.name||item?.item_name||"").toLowerCase().replace(/[^a-z0-9]/g,"");
-  return IMAGE_BY_NORMALIZED_NAME[normalized]||"";
-}
+   const path=String(item?.image_path||"").trim();
+   // Accept a full image URL, a filename uploaded to this repository, or infer a filename from the food name.
+   if(path && /^https?:\/\//i.test(path)){
+     const githubRaw=path.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/i);
+     if(githubRaw)return "https://raw.githubusercontent.com/"+githubRaw[1]+"/"+githubRaw[2]+"/"+githubRaw[3]+"/"+githubRaw[4].split("?")[0];
+     return path;
+   }
+   const filename=path.replace(/^\.\//,"").replace(/^\//,"").split("/").pop();
+   if(filename && /^[a-z0-9 _-]+\.(jpg|jpeg|png|webp|gif)$/i.test(filename)){
+     return "https://raw.githubusercontent.com/mayuu-p/Qr-system-/main/"+filename.split(" ").map(encodeURIComponent).join("%20");
+   }
+   const normalized=String(item?.name||item?.item_name||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+   const mapped=IMAGE_BY_NORMALIZED_NAME[normalized];
+   if(mapped)return "https://raw.githubusercontent.com/mayuu-p/Qr-system-/main/"+mapped;
+   return "https://raw.githubusercontent.com/mayuu-p/Qr-system-/main/"+normalized+".jpg";
+ }
 function imageFallback(img){img.onerror=null;img.style.display="none";const label=img.parentElement?.querySelector(".photo-label");if(label)label.textContent="Photo coming soon"}
 function renderMenu(){const list=menuItems.filter(x=>activeCategory==="All"||(x.category||"Popular")===activeCategory);if(!list.length){$("menu").innerHTML="<p>No items in this category yet.</p>";return}$("menu").innerHTML=list.map((item,index)=>{const src=imageFor(item);const loading=index<6?"eager":"lazy";return '<article class="card" style="animation-delay:'+Math.min(index*35,250)+'ms"><div class="photo">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="'+esc(item.name)+'" onerror="imageFallback(this)">':'<div style="height:100%;display:grid;place-items:center;color:#777d75;font-size:12px">Photo coming soon</div>')+'<span class="photo-label">'+esc(item.category||"Popular")+'</span></div><div class="card-body"><h3>'+esc(item.name)+'</h3><div class="desc">Freshly prepared · Made to order</div><div class="card-foot"><span class="price">'+money(item.price)+'</span>'+(item.is_available?'<button class="add" aria-label="Add '+esc(item.name)+'" onclick="addItemByIndex('+index+')">+</button>':'<span class="unavailable-pill">Unavailable</span>')+'</div></div></article>'}).join("")}
 function addItemByIndex(index){const item=menuItems[index];if(item)addItem(item.id)}
