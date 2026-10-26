@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026i"){u.searchParams.set("v","20261026i");location.replace(u.href)}})();</script>
+<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026j"){u.searchParams.set("v","20261026j");location.replace(u.href)}})();</script>
 <meta name="theme-color" content="#17251f">
 <title>Thyme & Whisk | Order at Your Table</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1586,8 +1586,9 @@ async function loadRestaurantBrand(){const applyName=name=>{const clean=String(n
 async function loadTable(){const tableEl=$("tableLabel");if(tableEl)tableEl.textContent="Finding your table…";const timeoutTag={tableTimeout:true};try{const result=await Promise.race([db.from("restaurant_tables").select("table_number").eq("id",tableId).eq("restaurant_id",restaurantId).maybeSingle(),new Promise(resolve=>setTimeout(()=>resolve(timeoutTag),8000))]);if(result===timeoutTag){if(tableEl)tableEl.textContent="Table connection timed out";notify("Table lookup timed out. The menu will still try to load.","error");return}const {data,error}=result;if(error||!data){if(tableEl)tableEl.textContent="Table not found";notify("Table lookup failed: "+(error?.message||"QR table is not configured"),"error");return}tableNumber=String(data.table_number).replace(/^0+/,"")||"1";if(tableEl)tableEl.textContent="TABLE "+tableNumber;$("confirmationTable").textContent="Table "+tableNumber;$("customerOrdersBtn").classList.remove("hidden");subscribeCustomerOrders()}catch(error){if(tableEl)tableEl.textContent="Table lookup failed";notify("Table lookup failed: "+(error?.message||"Connection error"),"error")}}
 let menuLoadSequence=0;
 async function loadMenu(showLoading=true){
- const seq=++menuLoadSequence,el=$("menu");
- if(showLoading&&el)el.textContent="Loading fresh menu…";
+ const seq=++menuLoadSequence,el=$("menu"),cacheKey="qr-menu-cache-v2:"+restaurantId;
+ if(!menuItems.length){try{const cached=JSON.parse(sessionStorage.getItem(cacheKey)||"null");if(Array.isArray(cached)&&cached.length){menuItems=cached;menuSyncSignature=JSON.stringify(cached);renderCategories();renderMenu()}}catch(e){}}
+ if(showLoading&&el&&!menuItems.length)el.textContent="Loading fresh menu…";
  const timeoutTag={timeout:true};
  try{
   const result=await Promise.race([
@@ -1596,28 +1597,28 @@ async function loadMenu(showLoading=true){
   ]);
   if(seq!==menuLoadSequence)return;
   if(result===timeoutTag){
-   if(el)el.innerHTML='<div class="menu-load-error"><p>Menu request timed out. Check your connection or Supabase status.</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';
+   if(el&&!menuItems.length)el.innerHTML='<div class="menu-load-error"><p>Menu request timed out. Check your connection or Supabase status.</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';else if(menuItems.length)console.warn("Menu refresh timed out; keeping cached menu visible.");
    notify("Menu request timed out after 10 seconds.","error");
-   if(!window.__menuRetryTimer)window.__menuRetryTimer=setTimeout(()=>{window.__menuRetryTimer=null;if(!document.hidden)loadMenu(true)},8000);
+   if(!window.__menuRetryTimer)window.__menuRetryTimer=setTimeout(()=>{window.__menuRetryTimer=null;if(!document.hidden)loadMenu(true)},20000);
    return;
   }
   const {data,error}=result;
   if(error){
-   if(el)el.innerHTML='<div class="menu-load-error"><p>Menu could not load: '+esc(error.message||"Database error")+'</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';
+   if(el&&!menuItems.length)el.innerHTML='<div class="menu-load-error"><p>Menu could not load: '+esc(error.message||"Database error")+'</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';else if(menuItems.length)console.warn("Menu refresh failed; keeping cached menu visible.",error);
    notify("Menu error: "+(error.message||"Database error"),"error");
-   if(!window.__menuRetryTimer)window.__menuRetryTimer=setTimeout(()=>{window.__menuRetryTimer=null;if(!document.hidden)loadMenu(true)},10000);
+   if(!window.__menuRetryTimer)window.__menuRetryTimer=setTimeout(()=>{window.__menuRetryTimer=null;if(!document.hidden)loadMenu(true)},20000);
    return;
   }
-  menuItems=data||[];menuSyncSignature=JSON.stringify(menuItems);renderCategories();renderMenu();
+  menuItems=data||[];menuSyncSignature=JSON.stringify(menuItems);try{sessionStorage.setItem(cacheKey,JSON.stringify(menuItems))}catch(e){}renderCategories();renderMenu();
   if(!menuItems.length)notify("Menu loaded, but no menu items were found for this restaurant ID.","info");
  }catch(error){
   if(seq!==menuLoadSequence)return;
-  if(el)el.innerHTML='<div class="menu-load-error"><p>Menu connection failed: '+esc(error?.message||"Unknown error")+'</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';
+  if(el&&!menuItems.length)el.innerHTML='<div class="menu-load-error"><p>Menu connection failed: '+esc(error?.message||"Unknown error")+'</p><button type="button" class="secondary" onclick="loadMenu(true)">Retry menu</button></div>';else if(menuItems.length)console.warn("Menu refresh failed; keeping cached menu visible.",error);
   console.error("Menu load failed",error);
  }
 }
 async function syncLiveMenu(){if(menuSyncBusy||document.hidden||staffMode)return;menuSyncBusy=true;try{const {data,error}=await db.from("menu_items").select("id,name,price,category,image_path,is_available").eq("restaurant_id",restaurantId).order("name");if(error)return;const next=data||[],signature=JSON.stringify(next);if(signature===menuSyncSignature)return;menuSyncSignature=signature;const byId=new Map(next.map(item=>[item.id,item]));let removed=0;for(const id of Object.keys(cart)){const fresh=byId.get(id);if(!fresh||!fresh.is_available){delete cart[id];removed++}else cart[id].item=fresh}menuItems=next;renderCategories();renderMenu();renderCart();if(removed)notify("Your cart was updated because an item became unavailable or was removed.","info")}finally{menuSyncBusy=false}}
-function startCustomerLiveSync(){if(staffMode)return;if(menuSyncChannel)db.removeChannel(menuSyncChannel);menuSyncChannel=db.channel("customer-live-menu-"+restaurantId+"-"+tableId).on("postgres_changes",{event:"*",schema:"public",table:"menu_items",filter:"restaurant_id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurants",filter:"id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurant_tables",filter:"id=eq."+tableId},()=>syncLiveMenu()).subscribe();if(menuSyncTimer)clearInterval(menuSyncTimer);menuSyncTimer=setInterval(()=>{if(!document.hidden)syncLiveMenu()},1000)}
+function startCustomerLiveSync(){if(staffMode)return;if(menuSyncChannel)db.removeChannel(menuSyncChannel);menuSyncChannel=db.channel("customer-live-menu-"+restaurantId+"-"+tableId).on("postgres_changes",{event:"*",schema:"public",table:"menu_items",filter:"restaurant_id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurants",filter:"id=eq."+restaurantId},()=>syncLiveMenu()).on("postgres_changes",{event:"*",schema:"public",table:"restaurant_tables",filter:"id=eq."+tableId},()=>syncLiveMenu()).subscribe();if(menuSyncTimer)clearInterval(menuSyncTimer);menuSyncTimer=setInterval(()=>{if(!document.hidden)syncLiveMenu()},12000)}
 function renderCategories(){const cats=["All",...new Set(menuItems.map(x=>x.category||"Popular"))];if(!cats.includes(activeCategory))activeCategory="All";$("categories").innerHTML=cats.map(c=>'<button class="'+(c===activeCategory?"active":"")+'" onclick="setCategory(\''+esc(c)+'\')">'+esc(c)+"</button>").join("");$("menuCount").textContent=menuItems.length+" items"}
 function setCategory(c){activeCategory=c;renderCategories();renderMenu()}
 // Images are stored at the root of the GitHub Pages site. Prefer the exact database image_path.
@@ -1778,7 +1779,7 @@ function backToMenu(){location.href=location.pathname+"?restaurant="+encodeURICo
 function subscribeCustomerOrders(){
  if(customerOrderChannel)db.removeChannel(customerOrderChannel);if(editPollTimer)clearInterval(editPollTimer);editPollTimer=setInterval(()=>{if(ordersPage)loadCustomerOrders()},30000);
  let customerRefreshQueued=false;const refreshCustomerOrders=()=>{if(customerRefreshQueued)return;customerRefreshQueued=true;setTimeout(()=>{customerRefreshQueued=false;if(ordersPage||!$("customerOrdersPanel").classList.contains("hidden"))loadCustomerOrders()},350)};
- syncPollTimer=setInterval(()=>{if(document.hidden||staffMode||!tableId||syncPollBusy)return;const panel=$("customerOrdersPanel");if((ordersPage||(panel&&!panel.classList.contains("hidden")))&&!Object.values(customerEditing).some(Boolean)){syncPollBusy=true;loadCustomerOrders().finally(()=>{syncPollBusy=false})}},1000);
+ syncPollTimer=setInterval(()=>{if(document.hidden||staffMode||!tableId||syncPollBusy)return;const panel=$("customerOrdersPanel");if((ordersPage||(panel&&!panel.classList.contains("hidden")))&&!Object.values(customerEditing).some(Boolean)){syncPollBusy=true;loadCustomerOrders().finally(()=>{syncPollBusy=false})}},5000);
  customerOrderChannel=db.channel("customer-orders-"+tableId)
  .on("postgres_changes",{event:"*",schema:"public",table:"orders",filter:"table_id=eq."+tableId},refreshCustomerOrders)
  .on("postgres_changes",{event:"*",schema:"public",table:"order_items"},refreshCustomerOrders)
