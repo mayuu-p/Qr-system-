@@ -656,6 +656,99 @@ footer{color:#8fa5d5}
 }
 @media(prefers-reduced-motion:reduce){.staff-profile-menu{animation:none!important}#staffView .order,.staff-refresh,.staff-profile-trigger,.staff-profile-logout{transition:none!important}}
 
+
+/* STAFF DASHBOARD VISUAL REFRESH — airy blue liquid-glass dashboard inspired by the reference.
+   Presentation-only CSS: keep existing IDs, markup, Supabase queries and action handlers intact. */
+:root{--ink:#24364c;--green:#3978bd;--lime:#f3d98a;--cream:#edf5ff;--muted:#71839a;--line:rgba(255,255,255,.82);--white:#fff;--red:#d94d70}
+html{min-height:100%;background:#7ea7d7;scroll-behavior:smooth}
+body{min-height:100vh;background:radial-gradient(ellipse at 10% 12%,rgba(159,221,255,.95),transparent 35%),radial-gradient(ellipse at 90% 8%,rgba(224,212,255,.95),transparent 36%),radial-gradient(ellipse at 86% 85%,rgba(185,225,255,.9),transparent 35%),linear-gradient(135deg,#8ebce7 0%,#c8e6fb 45%,#c7c8f6 100%);color:#25364a}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 48% 45%,rgba(255,255,255,.38),transparent 52%);opacity:.8}
+.staff-glass-header{position:sticky;top:0;z-index:80;padding:12px clamp(12px,3vw,42px);background:rgba(247,250,255,.78);border-bottom:1px solid rgba(255,255,255,.88);box-shadow:0 8px 32px rgba(67,103,151,.08);backdrop-filter:blur(28px) saturate(165%);-webkit-backdrop-filter:blur(28px) saturate(165%)}
+.staff-glass-top{max-width:1580px;min-height:58px;gap:20px}
+.staff-brand-wrap .brand{font-size:clamp(17px,2vw,23px);letter-spacing:-.7px;color:#24364c;text-shadow:none}
+.staff-subtitle{color:#7a8ba2;font-size:10px;letter-spacing:.14em;font-weight:850}
+.staff-online-dot{background:#36c8a0;box-shadow:0 0 11px rgba(54,200,160,.7)}
+.staff-header-actions{gap:10px}
+.staff-refresh,.staff-header-actions #customerOrdersBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:10px 14px!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:14px!important;background:rgba(255,255,255,.65)!important;color:#506784!important;box-shadow:0 4px 15px rgba(75,112,163,.07),inset 0 1px 0 #fff;font-size:12px;font-weight:800;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:transform .18s,background .18s,box-shadow .18s}
+.staff-refresh:hover,.staff-header-actions #customerOrdersBtn:hover{background:rgba(255,255,255,.94)!important;box-shadow:0 8px 22px rgba(75,112,163,.12)}
+.staff-profile-trigger{display:flex;align-items:center;gap:10px;max-width:290px;min-width:0;padding:5px 11px 5px 6px;border:1px solid rgba(255,255,255,.95);border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(227,237,255,.74));color:#293b51;text-align:left;cursor:pointer;box-shadow:0 5px 18px rgba(75,112,163,.1),inset 0 1px 0 #fff;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.staff-profile-trigger:hover,.staff-profile-trigger[aria-expanded=true]{background:rgba(255,255,255,.96);border-color:#fff;box-shadow:0 8px 24px rgba(75,112,163,.16)}
+.staff-avatar-mini,.staff-profile-avatar{display:grid;place-items:center;flex:0 0 auto;border-radius:13px;color:#fff;font-weight:900;background:linear-gradient(145deg,#69b6f3,#748be7 68%,#9a9deb);box-shadow:0 5px 15px rgba(89,140,217,.24);border:1px solid rgba(255,255,255,.92)}
+.staff-avatar-mini{width:36px;height:36px;font-size:15px}
+.staff-profile-trigger-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.staff-profile-trigger-text strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.staff-profile-trigger-text small{font-size:10px;color:#8190a6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.staff-profile-chevron{font-size:18px;color:#8094b1;margin-left:3px}
+.staff-profile-menu{position:absolute;right:0;top:calc(100% + 12px);width:min(340px,calc(100vw - 24px));padding:17px;border:1px solid rgba(255,255,255,.95);border-radius:23px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(231,241,255,.92));box-shadow:0 25px 65px rgba(66,91,137,.23),inset 0 1px 0 #fff;backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);animation:staffProfileIn .18s ease-out;z-index:150}
+.staff-profile-menu.hidden{display:none!important}
+.staff-profile-card-top{display:flex;align-items:center;gap:12px;padding:3px 2px 16px;border-bottom:1px solid rgba(137,165,207,.18)}
+.staff-profile-avatar{width:48px;height:48px;border-radius:17px;font-size:20px}
+.staff-profile-meta{display:flex;flex-direction:column;gap:5px;min-width:0}
+.staff-profile-meta strong{font-size:15px;overflow-wrap:anywhere;color:#2c4059}
+.staff-profile-meta span{width:max-content;max-width:100%;padding:4px 8px;border-radius:999px;background:rgba(213,229,255,.8);border:1px solid rgba(255,255,255,.95);color:#5678ad;font-size:10px;font-weight:800}
+.staff-profile-email-label{margin-top:15px;color:#8294ac;font-size:9px;font-weight:900;letter-spacing:.16em}
+.staff-profile-email{margin-top:7px;padding:12px;border:1px solid rgba(255,255,255,.95);border-radius:13px;background:rgba(255,255,255,.68);color:#344a63;font-size:12px;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.staff-profile-logout{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:15px;min-height:45px;border:1px solid rgba(255,255,255,.95);border-radius:13px;background:linear-gradient(120deg,rgba(255,227,235,.9),rgba(255,243,247,.9));color:#c64f70;font-size:13px;font-weight:900;transition:background .18s,transform .18s}
+.staff-profile-logout:hover{background:rgba(255,220,231,.95)}
+@keyframes staffProfileIn{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+main{max-width:1600px;margin:18px auto 0;padding:clamp(14px,2.2vw,30px) clamp(12px,2.6vw,40px) 70px}
+#staffView{min-width:0}
+#staffView .panel,#staffView .order,#staffView #editRequests>.panel{position:relative;background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(247,250,255,.72));border:1px solid rgba(255,255,255,.96);border-radius:25px;box-shadow:0 12px 35px rgba(67,98,143,.09),inset 0 1px 0 #fff;color:#293b50;backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%)}
+#staffView .panel{padding:clamp(16px,2.1vw,25px);margin-bottom:18px}
+#staffView h2{color:#293b50;letter-spacing:-.035em;font-weight:850}
+#staffView .muted{color:#7c8ca2;line-height:1.55}
+#staffView .eyebrow{color:#6590c6}
+#staffView .section-head{gap:12px}
+#staffView .order{border-radius:22px!important;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}
+#staffView .order:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 0% 0%,rgba(149,208,255,.17),transparent 54%),radial-gradient(ellipse at 100% 100%,rgba(201,194,255,.14),transparent 52%)}
+#staffView .order:hover{border-color:rgba(255,255,255,1)!important;box-shadow:0 18px 42px rgba(67,98,143,.14),inset 0 1px 0 #fff;transform:translateY(-2px)}
+#staffView .order h2{font-family:Inter,Arial,sans-serif}
+#staffView .order-items-grid>.order-item{background:rgba(235,243,255,.75)!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:15px!important;color:#293b50}
+#staffView .order-item-info strong{color:#2d4158}
+#staffView .order-item-info .muted,#staffView .order-item-price{color:#7589a4!important}
+#staffView .total-row{border-top:1px solid rgba(137,165,207,.2);margin-top:10px;padding-top:16px;color:#293b50}
+#staffView .staff-customer-identity{color:#4b607b}
+#staffView .payment-order-chip{background:rgba(230,240,255,.8)!important;border-color:rgba(255,255,255,.95)!important;color:#5a7395!important}
+#staffView .accept-btn{background:linear-gradient(135deg,#42c9a5,#24a98c)!important;color:#fff!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:13px!important;box-shadow:0 7px 18px rgba(36,169,140,.18)!important}
+#staffView .served-btn{background:linear-gradient(135deg,#77a5f3,#7186e5)!important;color:#fff!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:13px!important;box-shadow:0 7px 18px rgba(100,132,220,.16)!important}
+#staffView .order-actions .secondary{background:rgba(255,255,255,.78)!important;color:#58708d!important;border:1px solid rgba(255,255,255,.98)!important;border-radius:13px!important}
+#staffView .field input,#staffView .field select,#staffView input,#staffView select{background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.98);border-radius:13px;color:#34465d}
+#staffView .notice{background:rgba(255,255,255,.85);color:#405772;border:1px solid rgba(255,255,255,.95)}
+#staffView #loginPanel{max-width:520px;margin:clamp(25px,6vw,70px) auto}
+#staffView #loginPanel .primary{border-radius:14px;background:linear-gradient(120deg,#69b6f3,#7588e8);color:#fff;border:1px solid rgba(255,255,255,.9);box-shadow:0 8px 22px rgba(94,139,215,.2)}
+#staffView #dashboard>.panel:first-child .section-head h2{font-size:clamp(21px,2.2vw,30px)}
+#staffView #dashboard>.panel:first-child>button[onclick="logout()"]{display:none!important}
+#staffView #tablesPage .grid{gap:13px}
+#staffView #tablesPage .order{padding:18px!important}
+#appModal .modal-card{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(233,242,255,.97));color:#293b50;border:1px solid rgba(255,255,255,.98);border-radius:25px;box-shadow:0 25px 80px rgba(51,79,122,.23)}
+#appModal .modal-card h2{color:#293b50}
+#appModal .modal-card .muted{color:#7b8ca3}
+#appModal .secondary{background:rgba(255,255,255,.82);color:#526987;border-color:rgba(255,255,255,.98)}
+#toastStack .app-toast{background:rgba(255,255,255,.94);color:#2d4158;border:1px solid rgba(255,255,255,.98);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 15px 42px rgba(51,79,122,.16)}
+#toastStack .app-toast.success{border-color:rgba(54,196,158,.45)}
+#toastStack .app-toast.error{border-color:rgba(238,110,145,.5)}
+footer{color:#6f829e}
+@media(max-width:650px){
+ .staff-glass-header{padding:9px 11px}
+ .staff-glass-top{min-height:47px;gap:8px}
+ .staff-brand-wrap .brand{font-size:15px;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .staff-subtitle{font-size:8px;letter-spacing:.08em;gap:4px}
+ .staff-header-actions{gap:6px}
+ .staff-refresh{width:39px;min-width:39px;justify-content:center;padding:0!important;font-size:17px!important;border-radius:13px!important}
+ .staff-refresh span{display:none}
+ .staff-profile-trigger{gap:0;padding:4px;border-radius:14px}
+ .staff-avatar-mini{width:35px;height:35px;border-radius:11px}
+ .staff-profile-trigger-text,.staff-profile-chevron{display:none}
+ .staff-profile-menu{right:0;top:calc(100% + 9px);width:min(320px,calc(100vw - 22px));padding:15px;border-radius:21px}
+ .staff-header-actions #customerOrdersBtn{display:none!important}
+ .staff-glass-header .table-pill{display:none!important}
+ main{margin-top:10px;padding:12px 11px 42px}
+ #staffView .panel{padding:15px;border-radius:20px}
+ #staffView .order{border-radius:19px!important}
+ #staffView #dashboard>.panel:first-child .section-head{align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){.staff-profile-menu{animation:none!important}#staffView .order,.staff-refresh,.staff-profile-trigger,.staff-profile-logout{transition:none!important}}
+
 </style>
 </head>
 <body>
