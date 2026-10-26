@@ -414,8 +414,24 @@ tbody tr:hover td{background:rgba(255,255,255,.24)}
  body:has(#loginScreen:not(.hidden)) .mobile-nav,
  body:has(#loginScreen:not(.hidden)) #mobileNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
 }
+
+/* ACCESSIBILITY / CONTRAST PASS: readable text and controls on the pastel glass dashboard. */
+:root{--muted:#52647e!important;--line:#c7d5e7!important}
+body{color:#26364b}
+.sub,.eyebrow,.metric small,.metric span,.profile-email-label,.form-field label,th,.profile-menu .profile-email-label{color:#4c607a!important;opacity:1!important}
+.metric,.panel,.table-card,.payment-order-card{border-color:#c7d5e7!important}
+td{color:#30445e!important}
+th{background:rgba(220,231,246,.88)!important}
+.field,input,select,textarea{color:#253a54!important;border-color:#bdcee2!important}
+.field::placeholder,input::placeholder,textarea::placeholder{color:#64778f!important;opacity:1!important}
+.btn:not(.primary):not(.green):not(.danger){color:#334c6a!important;border-color:#c1d2e6!important}
+.profile-dock-btn{color:#385b96!important}
+.mobile-nav button{color:#4b5f7a!important}
+.mobile-nav button.active{color:#fff!important}
+button:disabled{opacity:.78!important}
+
 </style>
-<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026k"){u.searchParams.set("v","20261026k");location.replace(u.href)}})();</script>
+<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 </head>
 <body>
 <section id="loginScreen" class="login"><form id="loginForm" class="login-card" onsubmit="return false"><div class="brand"><div class="logo">🍽️</div><div><span id="ownerBrandName">TABLE &amp; THYME</span><small>OWNER CONTROL CENTER</small></div></div><h1>Manage your restaurant.</h1><p>Sign in with the restaurant owner account. Only an owner account can change the live menu and store settings.</p><div class="form-field"><label>Email address</label><input id="email" class="field" type="email" autocomplete="username" required placeholder="owner@example.com"></div><div class="form-field"><label>Password</label><input id="password" class="field" type="password" autocomplete="current-password" required placeholder="Your password"></div><button class="btn primary" style="width:100%;padding:13px" id="loginBtn">Sign in securely →</button><p id="loginError" style="color:#b42318;margin:13px 0 0"></p></form></section>
