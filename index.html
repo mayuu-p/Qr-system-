@@ -1364,6 +1364,12 @@ body:not(.checkout-page) *{touch-action:pan-y}
 #categories.categories.is-dragging{cursor:grabbing!important;scroll-behavior:auto!important;scroll-snap-type:none!important}
 @media(max-width:700px){#categories.categories{gap:10px!important;padding:4px 2px 15px!important;scroll-snap-type:x proximity!important}#categories.categories>button{scroll-snap-align:start;min-height:44px}}
 
+
+/* Keep distance proportional to finger movement; inertia is driven by swipe speed in JS. */
+#categories.categories{scroll-snap-type:none!important;scroll-behavior:auto!important;overscroll-behavior-x:contain!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
+#categories.categories>button{scroll-snap-align:none!important}
+#categories.categories.is-dragging{scroll-behavior:auto!important}
+
 </style>
 
 <style id="staff-laptop-tablet-layout-fix">
@@ -1704,28 +1710,44 @@ document.addEventListener("contextmenu",e=>{if(!e.target.closest("input,textarea
  document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(["+","=","-","0"].includes(e.key)))e.preventDefault()});document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
 // Prevent browser pull-to-refresh at the top edge without disabling normal page scrolling.
 let pullStartY=0;document.addEventListener("touchstart",e=>{if(e.touches&&e.touches.length===1)pullStartY=e.touches[0].clientY},{passive:true});/* Native touch scrolling is intentionally not intercepted; CSS overscroll-behavior prevents scroll chaining. */
-/* Make category chips draggable on touch and mouse. Rendering follows requestAnimationFrame;
-   actual screen refresh rate is controlled by the device/browser. */
+/* Native-speed horizontal category rail with velocity-based fling.
+   Slow drags stop where the finger stops; fast flicks coast farther with momentum. */
 (function(){
  const rail=document.getElementById("categories");if(!rail)return;
- let down=false,startX=0,startScroll=0,pointerId=null,lastX=0,raf=0,dragged=false;
+ let down=false,startX=0,startScroll=0,pointerId=null,lastX=0,lastTime=0,velocity=0,raf=0,dragged=false;
+ const cancelFling=()=>{if(raf){cancelAnimationFrame(raf);raf=0}};
+ const end=()=>{
+  if(!down)return;
+  down=false;pointerId=null;rail.classList.remove("is-dragging");
+  const max=Math.max(0,rail.scrollWidth-rail.clientWidth);
+  if(Math.abs(velocity)<0.08||rail.scrollLeft<=0||rail.scrollLeft>=max){velocity=0;return}
+  let previous=performance.now();
+  const coast=now=>{
+   const dt=Math.min(32,Math.max(1,now-previous));previous=now;
+   rail.scrollLeft+=velocity*dt;
+   velocity*=Math.pow(0.94,dt/16.67);
+   if(Math.abs(velocity)<0.035||rail.scrollLeft<=0||rail.scrollLeft>=Math.max(0,rail.scrollWidth-rail.clientWidth)){raf=0;velocity=0;return}
+   raf=requestAnimationFrame(coast);
+  };
+  raf=requestAnimationFrame(coast);
+ };
  rail.addEventListener("pointerdown",e=>{
   if(e.pointerType==="mouse"&&e.button!==0)return;
-  down=true;dragged=false;startX=e.clientX;lastX=e.clientX;startScroll=rail.scrollLeft;pointerId=e.pointerId;
-  rail.classList.add("is-dragging");
+  cancelFling();velocity=0;down=true;dragged=false;startX=e.clientX;lastX=e.clientX;lastTime=performance.now();startScroll=rail.scrollLeft;pointerId=e.pointerId;rail.classList.add("is-dragging");
   try{rail.setPointerCapture(pointerId)}catch(_){}
  },{passive:true});
  rail.addEventListener("pointermove",e=>{
   if(!down||e.pointerId!==pointerId)return;
-  lastX=e.clientX;
-  if(Math.abs(lastX-startX)>5)dragged=true;
-  if(!dragged)return;
-  if(raf)cancelAnimationFrame(raf);
-  raf=requestAnimationFrame(()=>{rail.scrollLeft=startScroll-(lastX-startX);raf=0});
+  const now=performance.now(),dx=e.clientX-lastX,dt=now-lastTime;
+  if(Math.abs(e.clientX-startX)>5)dragged=true;
+  if(dragged){
+   rail.scrollLeft=startScroll-(e.clientX-startX);
+   if(dt>0&&dt<100)velocity=(-dx/dt)*1.55;
+  }
+  lastX=e.clientX;lastTime=now;
  },{passive:true});
- const end=()=>{down=false;pointerId=null;rail.classList.remove("is-dragging");if(raf){cancelAnimationFrame(raf);raf=0}};
  rail.addEventListener("pointerup",end,{passive:true});
- rail.addEventListener("pointercancel",end,{passive:true});
+ rail.addEventListener("pointercancel",()=>{velocity=0;end()},{passive:true});
  rail.addEventListener("lostpointercapture",end,{passive:true});
  rail.addEventListener("click",e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false}},true);
  rail.addEventListener("wheel",e=>{
