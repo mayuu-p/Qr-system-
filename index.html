@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026j"){u.searchParams.set("v","20261026j");location.replace(u.href)}})();</script>
+<script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 <meta name="theme-color" content="#17251f">
 <title>Thyme & Whisk | Order at Your Table</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1453,6 +1453,22 @@ footer{color:#8092a8}
 
 /* Performance: keep glass blur on the header/cart, not on every food tile. */
 #menu .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;content-visibility:auto;contain-intrinsic-size:320px}
+
+/* ACCESSIBILITY / CONTRAST PASS: keep the glass aesthetic, make every important label readable. */
+:root{--muted:#52657b!important;--line:#cbd8e7!important}
+body{color:#26384d!important}
+.muted,.tag,footer,.section-head .eyebrow,.hero p,.card p,.card .description,.cart-count,#bottomCount,.table-pill,.customer-header-actions button{color:#52657b!important}
+#bottomCart{background:rgba(255,255,255,.98)!important;border-color:#b8cbe0!important;color:#24364b!important;box-shadow:0 12px 34px rgba(39,63,96,.24)!important}
+#bottomTotal{color:#1e3047!important;font-weight:900!important;opacity:1!important}
+#bottomCount{color:#52657b!important;font-weight:700!important;opacity:1!important}
+#bottomCart button{color:#fff!important;background:linear-gradient(120deg,#4c9ddd,#526fda)!important;font-weight:850!important}
+#categories.categories>button{color:#3f5874!important;border-color:#c7d7e9!important;background:linear-gradient(145deg,#fff,#edf4fc)!important}
+#categories.categories>button.active,#categories.categories>button[aria-pressed="true"]{color:#fff!important;background:linear-gradient(135deg,#397fb8,#5267c6)!important}
+.card .price,.price{color:#205c94!important}
+.card .photo-label{color:#344b66!important;background:rgba(255,255,255,.97)!important;border-color:#d2deeb!important}
+button:disabled{opacity:.78!important}
+input::placeholder,textarea::placeholder{color:#65778c!important;opacity:1!important}
+
 </style>
 
 <style id="staff-laptop-tablet-layout-fix">
