@@ -801,6 +801,24 @@ footer{color:#6f829e}
 #staffView button:disabled{opacity:.78!important}
 #staffView input::placeholder,#staffView textarea::placeholder{color:#657a92!important;opacity:1!important}
 
+
+/* Readability and low-friction scrolling / image decoding pass. */
+html,body{scroll-behavior:auto!important;overscroll-behavior-y:auto!important;-webkit-overflow-scrolling:touch!important}
+body{color:#1e3046!important}
+p,.muted,.sub,.desc,.tag,footer,.section-head .eyebrow,.hero p,.card p,.card .description,.cart-count{color:#405570!important;opacity:1!important}
+.card,.panel,.order,.checkout-panel{color:#24364b!important}
+.card h3,.card .item-name,.card .price,.price,.card-foot,.order-item-info strong{color:#20364f!important;opacity:1!important}
+.card .desc,.card .description{color:#405570!important;opacity:1!important}
+#bottomCart{background:rgba(255,255,255,.99)!important;border:1px solid #aebfd5!important;color:#20344d!important;box-shadow:0 12px 32px rgba(39,63,96,.24)!important}
+#bottomTotal{display:block!important;color:#172b43!important;font-size:clamp(21px,4.4vw,28px)!important;font-weight:950!important;line-height:1.25!important;opacity:1!important}
+#bottomCount{display:block!important;color:#405570!important;font-size:14px!important;font-weight:750!important;line-height:1.35!important;opacity:1!important}
+#bottomCart button{color:#fff!important;background:linear-gradient(120deg,#368ac8,#455ec7)!important;font-weight:900!important;opacity:1!important}
+#categories.categories>button{color:#314963!important}
+.card .photo-label{color:#263f5b!important}
+#menu{content-visibility:auto;contain-intrinsic-size:1px 1200px}
+.card .photo img{display:block;content-visibility:auto}
+input::placeholder,textarea::placeholder{color:#5b6d83!important;opacity:1!important}
+
 </style>
 <script>(function(){var u=new URL(location.href);if(u.searchParams.get("v")!=="20261026l"){u.searchParams.set("v","20261026l");location.replace(u.href)}})();</script>
 </head>
@@ -956,7 +974,7 @@ function imageFor(item){
    return "https://raw.githubusercontent.com/mayuu-p/Qr-system-/main/"+normalized+".jpg";
  }
 function imageFallback(img){img.onerror=null;img.style.display="none";const label=img.parentElement?.querySelector(".photo-label");if(label)label.textContent="Photo coming soon"}
-function renderMenu(){const list=menuItems.filter(x=>activeCategory==="All"||(x.category||"Popular")===activeCategory);if(!list.length){$("menu").innerHTML="<p>No items in this category yet.</p>";return}$("menu").innerHTML=list.map((item,index)=>{const src=imageFor(item);const loading=index<6?"eager":"lazy";return '<article class="card" style="animation-delay:'+Math.min(index*35,250)+'ms"><div class="photo">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="'+esc(item.name)+'" onerror="imageFallback(this)">':'<div style="height:100%;display:grid;place-items:center;color:#777d75;font-size:12px">Photo coming soon</div>')+'<span class="photo-label">'+esc(item.category||"Popular")+'</span></div><div class="card-body"><h3>'+esc(item.name)+'</h3><div class="desc">Freshly prepared · Made to order</div><div class="card-foot"><span class="price">'+money(item.price)+'</span>'+(item.is_available?'<button class="add" aria-label="Add '+esc(item.name)+'" onclick="addItem(\''+esc(item.id)+'\')">+</button>':'<span class="unavailable-pill">Unavailable</span>')+'</div></div></article>'}).join("")}
+function renderMenu(){const list=menuItems.filter(x=>activeCategory==="All"||(x.category||"Popular")===activeCategory);if(!list.length){$("menu").innerHTML="<p>No items in this category yet.</p>";return}$("menu").innerHTML=list.map((item,index)=>{const src=imageFor(item);const loading=index<4?"eager":"lazy";return '<article class="card" style="animation-delay:'+Math.min(index*12,72)+'ms"><div class="photo">'+(src?'<img loading="'+loading+'" decoding="async" fetchpriority="'+(index<2?"high":"auto")+'" src="'+esc(src)+'" alt="'+esc(item.name)+'" onerror="imageFallback(this)">':'<div style="height:100%;display:grid;place-items:center;color:#777d75;font-size:12px">Photo coming soon</div>')+'<span class="photo-label">'+esc(item.category||"Popular")+'</span></div><div class="card-body"><h3>'+esc(item.name)+'</h3><div class="desc">Freshly prepared · Made to order</div><div class="card-foot"><span class="price">'+money(item.price)+'</span>'+(item.is_available?'<button class="add" aria-label="Add '+esc(item.name)+'" onclick="addItem(\''+esc(item.id)+'\')">+</button>':'<span class="unavailable-pill">Unavailable</span>')+'</div></div></article>'}).join("")}
 function addItemByIndex(index){const item=menuItems[index];if(item)addItem(item.id)}
 function addItem(id){const item=menuItems.find(x=>x.id===id);if(!item)return;if(item.is_available===false){notify(item.name+" is currently unavailable.","error");return}if(!cart[id])cart[id]={item,quantity:0};if(cart[id].quantity<50)cart[id].quantity++;renderCart()}
 function changeQty(id,delta){if(!cart[id])return;cart[id].quantity+=delta;if(cart[id].quantity<=0)delete cart[id];renderCart()}
